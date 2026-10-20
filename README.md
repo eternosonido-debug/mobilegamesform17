@@ -1,0 +1,43 @@
+# Mobile Games for M17
+
+Coleção de jogos originais para Linux no portátil M17. Registro inicial de decisões em 20/10/2026.
+
+## Estado confirmado pelo usuário
+- Cinco jogos já funcionam no M17. Não substituir ou alterar esses projetos até recuperar os respectivos fontes.
+- Nomes citados entre os existentes: Juicy Sort, Boca (antes Fominha/Hole.io), Sudoku, Mahjong. O quinto e a correspondência completa devem ser conferidos no repositório/ambiente original, sem suposição.
+- Protótipo de Block Out feito em HTML; **ainda não foi portado nem validado no M17**.
+- Direção visual Block Out aprovada: puzzle de deslizar blocos até portas da mesma cor; pixel art 16-bit inspirada em consoles clássicos, sem copiar franquias.
+- Prévia visual Juicy Sort aprovada: laranja fatiada gigante em pixel art, parcialmente cortada na borda; outros menus/capas serão feitos depois.
+
+## Jogos novos selecionados na curadoria
+1. Block Out
+2. Screw Puzzle
+3. Rotate Rings
+4. Magic Tiles (ritmo, considerar quatro botões frontais e quatro superiores)
+5. Pocket Beats (groovebox de 16 passos; bateria, baixo, guitarra, sintetizador)
+6. Paper.io (mecânica original inspirada em conquista de território)
+7. Slither.io (evitar duplicar Snake Clash)
+8. Toon Blast (mecânica própria de grupos de blocos)
+9. Helix Jump
+10. Going Balls
+11. Stack Ball
+12. Tomb of the Mask
+13. Archero
+14. Bridge Race
+15. Tank Hero
+16. Labirinto: avaliar conceito final entre referências Labyrinth e Maze Machina, evitando duplicatas
+17. Minichef (culinária, recuperar conceito anterior)
+
+## Ordem inicial aprovada
+Block Out → Screw Puzzle → Rotate Rings → Toon Blast → Stack Ball → demais.
+
+## Pendências técnicas
+- Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.
+- Portar o Block Out de protótipo HTML para o mesmo stack nativo adotado nos jogos existentes; testar controles e desempenho no console.
+- Não afirmar que jogos novos já rodam no aparelho sem testes.
+- Criar menu próprio e capa de cada jogo somente após consolidar seleção e implementação.
+
+## Estrutura proposta
+- `games/`: fontes dos títulos, quando recuperados/criados.
+- `assets/`: artes e capas.
+- `docs/`: decisões, portabilidade e instruções de instalação.
