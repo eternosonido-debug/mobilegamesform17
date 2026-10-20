@@ -41,3 +41,17 @@ Block Out → Screw Puzzle → Rotate Rings → Toon Blast → Stack Ball → de
 - `games/`: fontes dos títulos, quando recuperados/criados.
 - `assets/`: artes e capas.
 - `docs/`: decisões, portabilidade e instruções de instalação.
+
+
+## Direção de arte e arquitetura compartilhada (20/10/2026)
+
+- **Estética**: pixel art com referência à era 16-bit. É uma linguagem visual, não uma limitação técnica obrigatória para todos os títulos.
+- **Tela-alvo do M17**: 480 × 272. Proposta de canvas lógico de **240 × 136**, escala inteira 2x por nearest-neighbor (sem suavização), a validar no aparelho.
+- **Identidade comum**: menus, navegação, tipografia, feedback sonoro, controles e telas de pausa coerentes.
+- **Identidade individual**: paleta, ilustração, mecânica e capa específicas por jogo. Evitar que Block Out se confunda com New Tetris.
+- **Menu Juicy Sort**: referência aprovada com laranja fatiada pixelada gigantesca, aproximadamente um quarto visível, cortada pela borda.
+- **Block Out**: blocos e portas correspondentes em cores, pixel art retrô aprovada. Não confundir com jogo de formar linhas.
+- **Assets reutilizáveis**: atlas de sprites e componentes genéricos; texturas de interface, fontes, ícones de controle, sons de interface e transições. Não reutilizar personagens/arte protegida de aplicativos de referência.
+- **Performance**: sprites em baixa resolução, áudio simples e carregamento leve. Medir desempenho real antes de prometer compatibilidade.
+- **Controles**: padronizar mapa SDL de D-pad, A/B, Start/Select e ombros L1/L2/R1/R2 conforme detecção do M17; cada jogo pode especializar as funções. Evitar exigir toque.
+- **Entrega por título**: mecânica funcional → teste no M17 → refinamento visual → menu próprio → capa no seletor. Não confundir protótipo HTML com binário Linux instalado.
