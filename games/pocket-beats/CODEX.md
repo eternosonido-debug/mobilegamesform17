@@ -28,3 +28,7 @@
 
 ## Atenção a direitos autorais
 Criar gráficos, sons, níveis e lógica de implementação próprios. A referência inspira o gênero/mecânica; não copiar assets, níveis ou código.
+
+## Atualização aprovada em 20/10/2026
+
+Sequência global ajustável de 4/8/16/32 passos, inicial 16; sem comprimento por instrumento. Primeira publicação inclui as quatro pistas com som e três beats prontos editáveis. A groovebox não tem vitória/derrota nem fases obrigatórias: usar três padrões reproduzíveis como cenários. Controles efetivos e testes estão documentados em README.md, BUILD.md e VALIDATION.json.

@@ -1,0 +1,42 @@
+{
+  "game": "Pocket Beats",
+  "native_build": true,
+  "standalone_tests_passed": 3,
+  "repository_tests_passed": 19,
+  "sanitizers": [
+    "AddressSanitizer",
+    "UndefinedBehaviorSanitizer"
+  ],
+  "four_distinct_nonzero_instrument_outputs": true,
+  "presets": 3,
+  "global_step_lengths": [
+    4,
+    8,
+    16,
+    32
+  ],
+  "virtual_sticks_tested": 2,
+  "hardware_tested": false,
+  "sd_modified": false,
+  "arm": {
+    "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+    "interpreter": [
+      "/lib/ld-linux.so.3"
+    ],
+    "libraries": [
+      "pocket-beats",
+      "libSDL2-2.0.so.0",
+      "libpthread.so.0",
+      "libc.so.6",
+      "libdl.so.2",
+      "ld-linux.so.3",
+      "libm.so.6",
+      "libEGL.so",
+      "libIMGegl.so",
+      "libsrv_um.so"
+    ],
+    "strong_imports_checked": 532,
+    "failures": [],
+    "note": "Static compatibility inspection; not runtime or hardware test"
+  }
+}
