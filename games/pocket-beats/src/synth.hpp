@@ -2,12 +2,14 @@
 #include "game_logic.hpp"
 #include <cmath>
 #include <cstdint>
+#include <vector>
 namespace pocketbeats {
 // Original deterministic synthesis. No samples, assets or audio from other
 // games.
 struct Voice {
   double age = 10, frequency = 110;
   int note = 0;
+  int position = 0;
 };
 struct Synth {
   static constexpr int rate = 22050;
@@ -22,8 +24,11 @@ struct Synth {
     if (restart || run != playing) {
       step = -1;
       samplesToStep = 0;
-      for (auto &v : voices)
+      for (auto &v : voices) {
         v.age = 10;
+        v.note = 0;
+        v.position = 0;
+      }
     }
     playing = run;
   }
@@ -35,12 +40,13 @@ struct Synth {
         auto &v = voices[t];
         v.age = 0;
         v.note = n;
+        v.position = 0;
         static const int scale[] = {0, 0, 3, 5, 7, 10, 12, 15, 19};
         v.frequency = 55 * std::pow(2., scale[n] / 12.);
       }
     }
   }
-  double voice(int t) {
+  double rawVoice(int t) {
     auto &v = voices[t];
     double a = v.age;
     v.age += 1. / rate;
@@ -73,7 +79,31 @@ struct Synth {
             std::exp(-3 * a) * std::min(1., a * 50) * .6;
     return out * pattern.volume[t] / 100.;
   }
+  static const std::vector<int16_t> &bank() {
+    static const std::vector<int16_t> data = [] {
+      const int duration = rate * 6 / 5;
+      std::vector<int16_t> samples(4 * 9 * duration, 0);
+      Synth generator;
+      generator.pattern.volume.fill(100);
+      static const int scale[] = {0, 0, 3, 5, 7, 10, 12, 15, 19};
+      for (int t = 0; t < 4; ++t)
+        for (int n = 1; n <= 8; ++n) {
+          auto &v = generator.voices[t];
+          v.age = 0;
+          v.note = n;
+          v.frequency = 55 * std::pow(2., scale[n] / 12.);
+          generator.noise = 89123;
+          for (int i = 0; i < duration; ++i)
+            samples[(t * 9 + n) * duration + i] = int16_t(
+                std::max(-1., std::min(1., generator.rawVoice(t))) * 24000);
+        }
+      return samples;
+    }();
+    return data;
+  }
   void render(int16_t *out, int count) {
+    const auto &samples = bank();
+    const int duration = rate * 6 / 5;
     for (int i = 0; i < count; ++i) {
       if (playing && samplesToStep <= 0) {
         trigger();
@@ -81,11 +111,18 @@ struct Synth {
       }
       if (playing)
         --samplesToStep;
-      double sum = 0;
+      int sum = 0;
       if (playing)
-        for (int t = 0; t < 4; ++t)
-          sum += voice(t);
-      out[i] = int16_t(std::max(-1., std::min(1., sum * .25)) * 30000);
+        for (int t = 0; t < 4; ++t) {
+          auto &v = voices[t];
+          if (v.note && v.position < duration) {
+            if (pattern.audible(t))
+              sum += samples[(t * 9 + v.note) * duration + v.position] *
+                     pattern.volume[t] / 100;
+            ++v.position;
+          }
+        }
+      out[i] = int16_t(std::max(-30000, std::min(30000, sum / 3)));
     }
   }
 };

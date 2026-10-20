@@ -18,22 +18,22 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
   c.text(174, 5, s.playing ? "PLAY" : "STOP", s.playing ? accent : dim);
   if (s.scene == Scene::Menu) {
     c.centered(120, 27, "FOUR TRACK GROOVEBOX", white);
-    const char *items[] = {"MAKE MUSIC", "HOW TO PLAY", "PLAY SAVED BEAT",
-                           "SAVE AND EXIT"};
-    for (int i = 0; i < 4; ++i) {
+    const char *items[] = {"CONTINUE EDITING", "NIGHT DRIVE", "SUNNY POP",
+                           "BROKEN BEAT",      "HOW TO PLAY", "SAVE AND EXIT"};
+    for (int i = 0; i < 6; ++i) {
       if (s.menu == i)
-        c.round(29, 44 + i * 17, 182, 14, 3, panel);
-      c.centered(120, 48 + i * 17, items[i], s.menu == i ? accent : dim);
+        c.round(25, 39 + i * 13, 190, 12, 2, panel);
+      c.centered(120, 42 + i * 13, items[i], s.menu == i ? accent : dim);
     }
-    c.centered(120, 122, "A CHOOSE   SELECT SAVE EXIT", dim);
+    c.centered(120, 124, "A CHOOSE BEAT", dim);
     return;
   }
   if (s.scene == Scene::Tutorial) {
     const char *lines[] = {"DIRECTIONS SELECT A PAD",
                            "A TOGGLE NOTE   START PLAY",
-                           "Y CHOOSES A SETTING",
-                           "LEFT RIGHT CHANGE SETTING",
-                           "UP DOWN CHOOSE TRACK",
+                           "Y OPENS SETTINGS PANEL",
+                           "UP DOWN CHOOSE SETTING",
+                           "LEFT RIGHT CHANGE VALUE",
                            "B MENU   SELECT SAVE EXIT",
                            "THREE EDITABLE BEATS READY",
                            "ALL TRACKS SHARE LOOP SIZE",
@@ -51,6 +51,24 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
         c.round(24, 40 + i * 16, 192, 14, 3, panel);
       c.centered(120, 44 + i * 16, items[i], s.pause == i ? accent : dim);
     }
+    return;
+  }
+  if (app.settings) {
+    c.centered(120, 21, std::string("SETTINGS - ") + names[s.track], accent);
+    std::string rows[] = {
+        "TEMPO       " + std::to_string(p.bpm) + " BPM",
+        "LOOP        " + std::to_string(p.length) + " STEPS",
+        "VOLUME      " + std::to_string(p.volume[s.track]),
+        std::string("MUTE        ") + (p.mute[s.track] ? "ON" : "OFF"),
+        std::string("SOLO        ") + (p.solo == s.track ? "ON" : "OFF"),
+        "PAD NOTE    " + std::to_string(p.notes[s.track][s.cursor]),
+        "PATTERN     " + std::to_string(s.slot + 1)};
+    for (int i = 0; i < 7; ++i) {
+      if (s.setting == i)
+        c.round(14, 33 + i * 12, 212, 11, 2, panel);
+      c.text(22, 35 + i * 12, rows[i], s.setting == i ? accent : dim);
+    }
+    c.centered(120, 124, "LEFT RIGHT CHANGE  B BACK", white);
     return;
   }
   c.text(7, 19, std::string(presets[s.slot]) + " " + std::to_string(s.slot + 1),
@@ -91,36 +109,10 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
         c.rect(x, y + 12, 18, 2, accent);
     }
   }
-  static const char *labels[] = {"PADS", "TEMPO", "LOOP", "VOLUME",
-                                 "MUTE", "SOLO",  "NOTE", "PATTERN"};
-  std::string value = labels[s.setting];
-  switch (s.setting) {
-  case 1:
-    value += " " + std::to_string(p.bpm);
-    break;
-  case 2:
-    value += " " + std::to_string(p.length);
-    break;
-  case 3:
-    value += " " + std::to_string(p.volume[s.track]);
-    break;
-  case 4:
-    value += p.mute[s.track] ? " ON" : " OFF";
-    break;
-  case 5:
-    value += p.solo == s.track ? " ON" : " OFF";
-    break;
-  case 6:
-    value += " " + std::to_string(p.notes[s.track][s.cursor]);
-    break;
-  case 7:
-    value += " " + std::to_string(s.slot + 1);
-    break;
-  }
-  c.text(5, 116, "Y " + value, accent);
+  c.text(5, 116, "A PAD   Y SETTINGS", accent);
   c.text(5, 128,
          app.message.empty()
-             ? (audio ? "A PAD  START PLAY  B MENU" : "NO AUDIO DEVICE")
+             ? (audio ? "START PLAY   B MENU" : "NO AUDIO DEVICE")
              : app.message,
          dim);
 }

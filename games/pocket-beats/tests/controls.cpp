@@ -39,9 +39,11 @@ int main() {
     app.action(Y);
     app.action(Right);
     check(app.state.current().bpm == 105, "Y tempo");
-    app.action(Y);
+    app.action(Down);
     app.action(Right);
     check(app.state.current().length == 32, "global loop");
+    app.action(B);
+    check(!app.settings && app.state.playing, "B closes settings while playing");
     app.action(B);
     check(!app.state.playing && app.state.scene == Scene::Paused, "B pause");
     app.action(A);

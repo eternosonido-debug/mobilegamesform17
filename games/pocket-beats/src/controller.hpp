@@ -4,7 +4,7 @@
 namespace pocketbeats {
 struct Controller {
   Session state;
-  bool quit = false, restart = false, dirty = false;
+  bool quit = false, restart = false, dirty = false, settings = false;
   std::string message;
   void action(Control c) {
     auto &s = state;
@@ -16,19 +16,20 @@ struct Controller {
     }
     if (s.scene == Scene::Menu) {
       if (c == Up)
-        s.menu = (s.menu + 3) % 4;
+        s.menu = (s.menu + 5) % 6;
       if (c == Down)
-        s.menu = (s.menu + 1) % 4;
+        s.menu = (s.menu + 1) % 6;
       if (c == A) {
         if (s.menu == 0)
           s.scene = Scene::Playing;
-        else if (s.menu == 1)
-          s.scene = Scene::Tutorial;
-        else if (s.menu == 2) {
+        else if (s.menu <= 3) {
+          s.chooseSlot(s.menu - 1);
           s.scene = Scene::Playing;
           s.playing = true;
           restart = true;
-        } else
+        } else if (s.menu == 4)
+          s.scene = Scene::Tutorial;
+        else
           quit = true;
       }
       return;
@@ -71,28 +72,37 @@ struct Controller {
     if (c == Start) {
       s.playing = !s.playing;
       restart = true;
-    } else if (c == A) {
+      return;
+    }
+    if (c == Y) {
+      settings = !settings;
+      return;
+    }
+    if (settings) {
+      if (c == B) {
+        settings = false;
+        return;
+      }
+      if (c == Up)
+        s.setting = (s.setting + 6) % 7;
+      if (c == Down)
+        s.setting = (s.setting + 1) % 7;
+      if (c == Left || c == Right) {
+        s.adjust(c == Right ? 1 : -1);
+        dirty = true;
+      }
+      return;
+    }
+    if (c == A) {
       s.current().toggle(s.track, s.cursor);
       dirty = true;
     } else if (c == B) {
       s.playing = false;
       s.scene = Scene::Paused;
-    } else if (c == Y) {
-      s.setting = (s.setting + 1) % 8;
-    } else if (c == Left || c == Right) {
-      int delta = c == Right ? 1 : -1;
-      if (s.setting == 0)
-        s.move(delta, 0);
-      else {
-        s.setting--;
-        s.adjust(delta);
-        s.setting++;
-        dirty = true;
-      }
-    } else if (c == Up || c == Down) {
-      int delta = c == Down ? 1 : -1;
-      s.move(0, delta);
-    }
+    } else if (c == Left || c == Right)
+      s.move(c == Right ? 1 : -1, 0);
+    else if (c == Up || c == Down)
+      s.move(0, c == Down ? 1 : -1);
   }
 };
 } // namespace pocketbeats

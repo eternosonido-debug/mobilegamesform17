@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
     }
     Input input;
     Audio audio;
+    audio.sync(app.state.current(), app.state.playing);
     std::signal(SIGINT, stop);
     std::signal(SIGTERM, stop);
     Uint32 repeat = 0, lastSave = 0;
@@ -89,9 +90,8 @@ int main(int argc, char **argv) {
       }
       oldx = d.x;
       oldy = d.y;
-      audio.sync(app.state.current(), app.state.playing);
-      audio.pump();
-      if (!smoke && app.dirty && now - lastSave >= 500) {
+
+      if (!smoke && app.dirty && !app.state.playing && now - lastSave >= 1500) {
         bool ok = app.state.save(path);
         app.message = ok ? "SAVED" : "SAVE FAILED";
         if (ok)

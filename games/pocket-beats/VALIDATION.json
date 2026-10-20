@@ -1,8 +1,8 @@
 {
   "game": "Pocket Beats",
   "native_build": true,
-  "standalone_tests_passed": 3,
-  "repository_tests_passed": 19,
+  "standalone_tests_passed": 4,
+  "repository_tests_passed": 20,
   "sanitizers": [
     "AddressSanitizer",
     "UndefinedBehaviorSanitizer"
@@ -35,8 +35,12 @@
       "libIMGegl.so",
       "libsrv_um.so"
     ],
-    "strong_imports_checked": 532,
+    "strong_imports_checked": 534,
     "failures": [],
     "note": "Static compatibility inspection; not runtime or hardware test"
-  }
+  },
+  "version": "0.2",
+  "ui_stall_audio_regression_passed": true,
+  "user_feedback_previous_version": "0.1 was tested by the user: awkward interface and possible stutters",
+  "sd_modified_this_revision": false
 }

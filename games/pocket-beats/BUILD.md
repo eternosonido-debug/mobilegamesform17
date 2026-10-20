@@ -17,7 +17,7 @@ Makefile equivalente na pasta do jogo. Teste sem janela/áudio físicos:
 SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software SDL_AUDIODRIVER=dummy ./build/pocket-beats/pocket-beats --smoke --screenshot preview.bmp
 ```
 
-Canvas lógico 240×136, saída inicial 480×272, escala sem suavização. Áudio mono S16 a 22050 Hz, quatro vozes sintetizadas; buffer mantido próximo de 46 ms. Não há alocação de áudio ou síntese em callback. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
+Canvas lógico 240×136, saída inicial 480×272, escala sem suavização. Áudio mono S16 a 22050 Hz, quatro vozes sintetizadas; blocos de 1024 amostras (cerca de 46 ms, latência real dependente do backend). Callback próprio mistura o banco preparado antes de abrir o dispositivo, sem alocação, trigonometria por amostra, desenho ou acesso a disco. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
 
 ## ARM do M17 anteriormente identificado
 
@@ -45,6 +45,6 @@ Select salva e encerra para o menu original. Save próprio: `fmg-test/saves/pock
 
 ## Validação
 
-Três grupos específicos: regras/save, áudio dos quatro instrumentos e controles SDL com ambos os manches virtuais. Build local também verificado com AddressSanitizer/UndefinedBehaviorSanitizer. Os 19 grupos do repositório passaram. Screenshot de smoke renderizado e inspecionado; demonstração sonora gerada diretamente pelo sintetizador.
+Quatro grupos específicos: regras/save, áudio dos quatro instrumentos e controles SDL com ambos os manches virtuais e reprodução independente da interface bloqueada. Build local também verificado com AddressSanitizer/UndefinedBehaviorSanitizer. Os 20 grupos do repositório passaram. Screenshot de smoke renderizado e inspecionado; demonstração sonora gerada diretamente pelo sintetizador.
 
 Pendente no M17: qualidade auditiva, mapeamento físico A/B/X/Y e ambos os manches, fluidez/FPS, ausência de cortes de áudio e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo no console.

@@ -5,12 +5,26 @@ namespace pocketbeats {
 struct Audio {
   SDL_AudioDeviceID device = 0;
   Synth synth;
+  SDL_atomic_t visibleStep{}, callbackCount{}, renderedSamples{};
+  static void callback(void *userdata, Uint8 *stream, int bytes) {
+    auto *self = static_cast<Audio *>(userdata);
+    self->synth.render(reinterpret_cast<int16_t *>(stream), bytes / 2);
+    SDL_AtomicSet(&self->visibleStep,
+                  self->synth.playing ? self->synth.step : -1);
+    SDL_AtomicAdd(&self->callbackCount, 1);
+    SDL_AtomicAdd(&self->renderedSamples, bytes / 2);
+  }
   Audio() {
+    Synth::bank(); // Build original instrument samples BEFORE opening real-time
+                   // audio.
+    SDL_AtomicSet(&visibleStep, -1);
     SDL_AudioSpec spec{};
     spec.freq = Synth::rate;
     spec.format = AUDIO_S16SYS;
     spec.channels = 1;
-    spec.samples = 512;
+    spec.samples = 1024;
+    spec.callback = callback;
+    spec.userdata = this;
     device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, 0);
     if (device)
       SDL_PauseAudioDevice(device, 0);
@@ -20,28 +34,12 @@ struct Audio {
       SDL_CloseAudioDevice(device);
   }
   void sync(const Pattern &p, bool run, bool restart = false) {
-    if (device && (restart || synth.playing != run))
-      SDL_ClearQueuedAudio(device);
+    if (device)
+      SDL_LockAudioDevice(device);
     synth.sync(p, run, restart);
+    if (device)
+      SDL_UnlockAudioDevice(device);
   }
-  void pump() {
-    if (!device)
-      return;
-    int16_t samples[256];
-    while (SDL_GetQueuedAudioSize(device) < 2048) {
-      synth.render(samples, 256);
-      SDL_QueueAudio(device, samples, sizeof(samples));
-    }
-  }
-  int audibleStep() const {
-    if (!device || !synth.playing)
-      return -1;
-    double samples = SDL_GetQueuedAudioSize(device) / 2.;
-    double duration = Synth::rate * 60. / (synth.pattern.bpm * 4.);
-    int behind =
-        int(std::ceil(std::max(0., samples - synth.samplesToStep) / duration));
-    return (synth.step - behind + synth.pattern.length * 4) %
-           synth.pattern.length;
-  }
+  int audibleStep() { return SDL_AtomicGet(&visibleStep); }
 };
 } // namespace pocketbeats
