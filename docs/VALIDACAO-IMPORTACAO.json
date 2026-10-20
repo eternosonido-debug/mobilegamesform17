@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-20",
+  "source_commit": "816c4e0",
+  "version": "1.14.0",
+  "local_test_suites": 13,
+  "local_test_suites_passed": 13,
+  "per_game_native_entries_built": 8,
+  "per_game_smoke_tests_passed": 8,
+  "arm_entries_built": 8,
+  "arm_static_checks": {
+    "juices-sort": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "juices-sort",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "color-mix": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "color-mix",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "color-loop": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "color-loop",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "sudoku": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "sudoku",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "mahjong": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "mahjong",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "boca": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "boca",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "traffic-jam": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "traffic-jam",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    },
+    "new-blocks": {
+      "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+      "interpreter": [
+        "/lib/ld-linux.so.3"
+      ],
+      "libraries": [
+        "new-blocks",
+        "libSDL2-2.0.so.0",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libc.so.6",
+        "libdl.so.2",
+        "ld-linux.so.3",
+        "libEGL.so",
+        "libIMGegl.so",
+        "libsrv_um.so"
+      ],
+      "strong_imports_checked": 543,
+      "failures": [],
+      "note": "Static compatibility inspection; not runtime or hardware test"
+    }
+  },
+  "hardware_tested_after_import": false,
+  "sd_modified_by_import": false
+}

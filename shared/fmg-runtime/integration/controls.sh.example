@@ -1,0 +1,21 @@
+# Copy to fake-mobile-games/controls.sh on SD, adjust with --input-test.
+# These are FALLBACK indices for unrecognized SDL joysticks, not verified M17 IDs.
+export FMG_BUTTON_A=0
+export FMG_BUTTON_B=1
+export FMG_BUTTON_X=2
+export FMG_BUTTON_Y=3
+export FMG_BUTTON_START=7
+export FMG_BUTTON_SELECT=6
+export FMG_AXIS_X=0
+export FMG_AXIS_Y=1
+# Recognized SDL game controllers use SDL mappings. If necessary set:
+# export SDL_GAMECONTROLLERCONFIG='GUID,NAME,a:b0,b:b1,...'
+# Select only a driver compiled into your firmware's SDL2:
+# export SDL_VIDEODRIVER=kmsdrm
+# Second stick fallback axes; ignored when absent. Configure only after measuring.
+export FMG_AXIS_RX=2
+export FMG_AXIS_RY=3
+export FMG_DEADZONE=16000
+# Optional independent keyboard events emitted by the right stick:
+# export FMG_KEY_RIGHT_LEFT='J' FMG_KEY_RIGHT_RIGHT='L'
+# export FMG_KEY_RIGHT_UP='I' FMG_KEY_RIGHT_DOWN='K'

@@ -1,0 +1,14 @@
+<theme>
+  <formatVersion>7</formatVersion>
+  <include>../theme.xml</include>
+  <view name="basic, detailed, video">
+    <text name="nameLabel" extra="true"><text>Fake Mobile Games</text></text>
+  </view>
+  <view name="system">
+    <text name="sys_line1" extra="true"><text>Fake Mobile</text></text>
+    <text name="sys_line2" extra="true"><text>Games</text></text>
+    <text name="shortdescription" extra="true"><text>7 original offline games</text></text>
+    <text name="longdescription" extra="true"><text>Juices Sort, New Blocks, Color Mix, Sudoku, Traffic Jam, Mahjong and Boca.</text></text>
+    <image name="poster" extra="true"><path>./preview.png</path><origin>1 0.5</origin><pos>0.98 0.5</pos><size>0.47 0</size></image>
+  </view>
+</theme>

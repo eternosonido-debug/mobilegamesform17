@@ -2,6 +2,12 @@
 
 Coleção de jogos originais para Linux no portátil M17. Registro inicial de decisões em 20/10/2026.
 
+## Fontes recuperados neste repositório
+
+Oito jogos existentes já possuem pasta, fontes, entrada de build e documentação: **Juices Sort, New Blocks, Color Mix, Sudoku, Traffic Jam, Mahjong, Boca e Color Loop**. Consulte [inventário verificado](docs/INVENTARIO-RECUPERADO.md), [controles atuais](docs/CONTROLS.md) e [build M17 recuperado](docs/M17-RECUPERADO.md).
+
+O registro inicial abaixo é histórico. Suas pendências sobre localizar fontes e identificar os cinco Ports foram esclarecidas no inventário. A revisão mais recente dos controles ainda depende de teste físico.
+
 ## Estado confirmado pelo usuário
 - Cinco jogos já funcionam no M17. Não substituir ou alterar esses projetos até recuperar os respectivos fontes.
 - Nomes citados entre os existentes: Juicy Sort, Boca (antes Fominha/Hole.io), Sudoku, Mahjong. O quinto e a correspondência completa devem ser conferidos no repositório/ambiente original, sem suposição.
