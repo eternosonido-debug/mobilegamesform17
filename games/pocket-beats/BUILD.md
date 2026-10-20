@@ -45,6 +45,6 @@ Select salva e encerra para o menu original. Save próprio: `fmg-test/saves/pock
 
 ## Validação
 
-Quatro grupos específicos: regras/save, áudio dos quatro instrumentos e controles SDL com ambos os manches virtuais e reprodução independente da interface bloqueada. Build local também verificado com AddressSanitizer/UndefinedBehaviorSanitizer. Os 20 grupos do repositório passaram. Screenshot de smoke renderizado e inspecionado; demonstração sonora gerada diretamente pelo sintetizador.
+Quatro grupos específicos: regras/save, áudio dos quatro instrumentos e controles SDL com ambos os manches virtuais e reprodução independente da interface bloqueada. Build local também verificado com AddressSanitizer/UndefinedBehaviorSanitizer. Os 20 grupos do repositório passaram. A revisão 0.3 acrescenta ao teste de controles alteração de nota por gatilhos, captura digital, persistência e cancelamento do mapeamento. Screenshot de smoke renderizado e inspecionado; demonstração sonora gerada diretamente pelo sintetizador.
 
 Pendente no M17: qualidade auditiva, mapeamento físico A/B/X/Y e ambos os manches, fluidez/FPS, ausência de cortes de áudio e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo no console.

@@ -9,6 +9,28 @@ constexpr int tracks = 4, maxSteps = 32, slots = 3;
 static const char *const names[] = {"DRUMS", "BASS", "GUITAR", "SYNTH"};
 static const char *const presets[] = {"NIGHT DRIVE", "SUNNY POP",
                                       "BROKEN BEAT"};
+inline std::string noteName(int track, int note) {
+  if (note == 0)
+    return "OFF";
+  if (track == 0) {
+    static const char *drums[] = {"OFF", "BUM", "CX", "CH", "B+H",
+                                  "C+H", "CH",  "CH", "CH"};
+    return drums[note];
+  }
+  static const char *notes[] = {"OFF", "LA", "DO", "RE", "MI",
+                                "SOL", "LA", "DO", "MI"};
+  return notes[note];
+}
+inline std::string fullNoteName(int track, int note) {
+  if (!note || track == 0)
+    return noteName(track, note);
+  int octave = track == 1 ? 1 : track == 2 ? 3 : 4;
+  if (note >= 2)
+    ++octave;
+  if (note >= 7)
+    ++octave;
+  return noteName(track, note) + std::to_string(octave);
+}
 struct Pattern {
   int length = 16, bpm = 110;
   std::array<std::array<int, maxSteps>, tracks> notes{};

@@ -69,6 +69,17 @@ struct Controller {
       }
       return;
     }
+    if (!settings && (c == NoteDown || c == NoteUp)) {
+      int &note = s.current().notes[s.track][s.cursor];
+      if (!note) {
+        message = "A ADICIONA A NOTA";
+        return;
+      }
+      int maximum = s.track == 0 ? 5 : 8;
+      note = std::max(1, std::min(maximum, note + (c == NoteUp ? 1 : -1)));
+      dirty = true;
+      return;
+    }
     if (c == Start) {
       s.playing = !s.playing;
       restart = true;
@@ -84,9 +95,9 @@ struct Controller {
         return;
       }
       if (c == Up)
-        s.setting = (s.setting + 6) % 7;
+        s.setting = (s.setting + 7) % 8;
       if (c == Down)
-        s.setting = (s.setting + 1) % 7;
+        s.setting = (s.setting + 1) % 8;
       if (c == Left || c == Right) {
         s.adjust(c == Right ? 1 : -1);
         dirty = true;

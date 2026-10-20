@@ -60,6 +60,8 @@ int main(int argc, char **argv) {
       app.state.playing = true;
     }
     Input input;
+    const std::string mappingPath = folder + "/pocket-beats-controls.cfg";
+    input.loadMapping(mappingPath);
     Audio audio;
     audio.sync(app.state.current(), app.state.playing);
     std::signal(SIGINT, stop);
@@ -73,6 +75,19 @@ int main(int argc, char **argv) {
           app.quit = true;
           break;
         }
+        if (app.settings && app.state.setting == 7 && !input.learning) {
+          // Consume A to enter learning; it must not become the L2 binding.
+          Control choice = input.event(e);
+          if (choice == A) {
+            input.beginMapping();
+            continue;
+          }
+          if (choice != None) {
+            app.action(choice);
+            audio.sync(app.state.current(), app.state.playing, app.restart);
+          }
+          continue;
+        }
         Control key = input.event(e);
         if (key != None) {
           app.action(key);
@@ -81,7 +96,7 @@ int main(int argc, char **argv) {
       }
       auto d = input.direction();
       Uint32 now = SDL_GetTicks();
-      if (d.x || d.y) {
+      if (!input.learning && (d.x || d.y)) {
         if (d.x != oldx || d.y != oldy || now >= repeat) {
           app.action(d.x ? (d.x > 0 ? Right : Left) : (d.y > 0 ? Down : Up));
           audio.sync(app.state.current(), app.state.playing, app.restart);
@@ -100,7 +115,13 @@ int main(int argc, char **argv) {
       }
       if (!app.message.empty() && now - lastSave > 1400)
         app.message.clear();
-      render(r, app, audio.audibleStep(), audio.device != 0);
+      if (input.mappingChanged) {
+        app.message = input.saveMapping(mappingPath) ? "L2 R2 SALVOS"
+                                                     : "ERRO AO SALVAR L2 R2";
+        input.mappingChanged = false;
+        lastSave = now;
+      }
+      render(r, app, audio.audibleStep(), audio.device != 0, input.learning);
       if (smoke && frames == 10 && !screenshot.empty()) {
         int width, height;
         SDL_GetRendererOutputSize(r, &width, &height);

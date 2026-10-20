@@ -1,6 +1,7 @@
 #include "../src/controller.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <unistd.h>
 void check(bool x, const char *m) {
   if (!x)
     throw std::runtime_error(m);
@@ -34,6 +35,51 @@ int main() {
     int n = app.state.current().notes[0][2];
     app.action(A);
     check(app.state.current().notes[0][2] == (n ? 0 : 1), "A toggle");
+    // Actual SDL events for pitch edits, learned digital triggers and rollback.
+    app.state.current().setNote(0, 2, 2);
+    e.key.keysym.sym = SDLK_e;
+    app.action(input.event(e));
+    check(app.state.current().notes[0][2] == 3, "R2 keyboard note up");
+    e.key.keysym.sym = SDLK_q;
+    app.action(input.event(e));
+    check(app.state.current().notes[0][2] == 2, "L2 keyboard note down");
+    app.state.current().setNote(0, 2, 0);
+    app.action(NoteDown);
+    check(app.state.current().notes[0][2] == 0, "empty step remains off");
+    app.state.current().setNote(0, 2, 1);
+    app.action(NoteDown);
+    check(app.state.current().notes[0][2] == 1, "lowest note remains on");
+    input.beginMapping();
+    e = {};
+    e.type = SDL_JOYBUTTONDOWN;
+    e.jbutton.which = SDL_JoystickInstanceID(j);
+    e.jbutton.button = 4;
+    input.event(e);
+    check(input.learning == 2, "learn L2");
+    input.event(e);
+    check(input.learning == 2, "duplicate trigger rejected");
+    e.jbutton.button = 5;
+    input.event(e);
+    check(!input.learning && input.mappingChanged, "learn R2");
+    check(input.event(e) == NoteUp, "learned R2 event");
+    std::string map = "/tmp/pocket-beats-controls-" + std::to_string(getpid());
+    check(input.saveMapping(map), "save trigger mapping");
+    Input loaded;
+    check(loaded.loadMapping(map) && loaded.event(e) == NoteUp,
+          "reload trigger mapping");
+    std::remove(map.c_str());
+    input.beginMapping();
+    e.jbutton.button = 5;
+    input.event(e);
+    e = {};
+    e.type = SDL_KEYDOWN;
+    e.key.keysym.sym = SDLK_x;
+    input.event(e);
+    check(!input.learning && input.pitch[0].button == 4,
+          "cancel mapping preserves old pair");
+    check(noteName(1, 1) == "LA" && fullNoteName(1, 2) == "DO2" &&
+              fullNoteName(2, 1) == "LA3",
+          "note names");
     app.action(Start);
     check(app.state.playing, "transport");
     app.action(Y);
@@ -43,7 +89,8 @@ int main() {
     app.action(Right);
     check(app.state.current().length == 32, "global loop");
     app.action(B);
-    check(!app.settings && app.state.playing, "B closes settings while playing");
+    check(!app.settings && app.state.playing,
+          "B closes settings while playing");
     app.action(B);
     check(!app.state.playing && app.state.scene == Scene::Paused, "B pause");
     app.action(A);

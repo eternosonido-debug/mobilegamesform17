@@ -35,12 +35,15 @@
       "libIMGegl.so",
       "libsrv_um.so"
     ],
-    "strong_imports_checked": 534,
+    "strong_imports_checked": 538,
     "failures": [],
     "note": "Static compatibility inspection; not runtime or hardware test"
   },
-  "version": "0.2",
+  "version": "0.3",
   "ui_stall_audio_regression_passed": true,
   "user_feedback_previous_version": "0.1 was tested by the user: awkward interface and possible stutters",
-  "sd_modified_this_revision": false
+  "sd_modified_this_revision": false,
+  "pitch_button_editing_tested": true,
+  "digital_trigger_learning_and_save_tested": true,
+  "physical_triggers_tested": false
 }

@@ -2,8 +2,8 @@
 #include "controller.hpp"
 #include "pixel.hpp"
 namespace pocketbeats {
-inline void render(SDL_Renderer *r, const Controller &app, int step,
-                   bool audio) {
+inline void render(SDL_Renderer *r, const Controller &app, int step, bool audio,
+                   int learning = 0) {
   using namespace ui;
   Canvas c(r);
   Paint bg(17, 23, 39), panel(30, 40, 60), white(231, 238, 245),
@@ -16,6 +16,14 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
   c.text(7, 5, "POCKET BEATS", accent);
   c.text(112, 5, std::to_string(p.bpm) + " BPM", white);
   c.text(174, 5, s.playing ? "PLAY" : "STOP", s.playing ? accent : dim);
+  if (learning) {
+    c.centered(120, 37, "CONFIGURAR GATILHOS", accent);
+    c.centered(120, 64,
+               learning == 1 ? "APERTE L2 PARA DESCER" : "APERTE R2 PARA SUBIR",
+               white);
+    c.centered(120, 90, "B CANCELA", dim);
+    return;
+  }
   if (s.scene == Scene::Menu) {
     c.centered(120, 27, "FOUR TRACK GROOVEBOX", white);
     const char *items[] = {"CONTINUE EDITING", "NIGHT DRIVE", "SUNNY POP",
@@ -36,7 +44,7 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
                            "LEFT RIGHT CHANGE VALUE",
                            "B MENU   SELECT SAVE EXIT",
                            "THREE EDITABLE BEATS READY",
-                           "ALL TRACKS SHARE LOOP SIZE",
+                           "L2 R2 CHANGE PAD NOTE",
                            "A OR B RETURN"};
     for (int i = 0; i < 9; ++i)
       c.centered(120, 22 + i * 12, lines[i], i == 8 ? accent : white);
@@ -61,12 +69,13 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
         "VOLUME      " + std::to_string(p.volume[s.track]),
         std::string("MUTE        ") + (p.mute[s.track] ? "ON" : "OFF"),
         std::string("SOLO        ") + (p.solo == s.track ? "ON" : "OFF"),
-        "PAD NOTE    " + std::to_string(p.notes[s.track][s.cursor]),
-        "PATTERN     " + std::to_string(s.slot + 1)};
-    for (int i = 0; i < 7; ++i) {
+        "PAD NOTE    " + fullNoteName(s.track, p.notes[s.track][s.cursor]),
+        "PATTERN     " + std::to_string(s.slot + 1),
+        "MAP L2 R2   A START"};
+    for (int i = 0; i < 8; ++i) {
       if (s.setting == i)
-        c.round(14, 33 + i * 12, 212, 11, 2, panel);
-      c.text(22, 35 + i * 12, rows[i], s.setting == i ? accent : dim);
+        c.round(14, 32 + i * 11, 212, 11, 2, panel);
+      c.text(22, 34 + i * 11, rows[i], s.setting == i ? accent : dim);
     }
     c.centered(120, 124, "LEFT RIGHT CHANGE  B BACK", white);
     return;
@@ -103,13 +112,15 @@ inline void render(SDL_Renderer *r, const Controller &app, int step,
       if (p.notes[t][n]) {
         c.rect(x + 3, y + 3, 12, 2, white);
         if (t)
-          c.centered(x + 9, y + 6, std::to_string(p.notes[t][n]), bg);
+          c.centered(x + 9, y + 6, noteName(t, p.notes[t][n]), bg);
       }
       if (n == step)
         c.rect(x, y + 12, 18, 2, accent);
     }
   }
-  c.text(5, 116, "A PAD   Y SETTINGS", accent);
+  c.text(5, 116,
+         "L2 - " + fullNoteName(s.track, p.notes[s.track][s.cursor]) + " + R2",
+         accent);
   c.text(5, 128,
          app.message.empty()
              ? (audio ? "START PLAY   B MENU" : "NO AUDIO DEVICE")
