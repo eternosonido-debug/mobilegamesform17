@@ -17,7 +17,7 @@ Makefile equivalente na pasta do jogo. Teste sem janela/áudio físicos:
 SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software SDL_AUDIODRIVER=dummy ./build/pocket-beats/pocket-beats --smoke --screenshot preview.bmp
 ```
 
-Canvas lógico 240×136, saída inicial 480×272, escala sem suavização. Áudio mono S16 a 22050 Hz, quatro vozes sintetizadas; blocos de 1024 amostras (cerca de 46 ms, latência real dependente do backend). Callback próprio mistura o banco preparado antes de abrir o dispositivo, sem alocação, trigonometria por amostra, desenho ou acesso a disco. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
+Canvas lógico 240×136, saída inicial 480×272, escala sem suavização. Áudio mono S16 a 22050 Hz, seis vozes de reprodução e vozes separadas para prévia; blocos de 1024 amostras (cerca de 46 ms, latência real dependente do backend). Callback próprio mistura o banco preparado antes de abrir o dispositivo, sem alocação, trigonometria por amostra, desenho ou acesso a disco. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
 
 ## ARM do M17 anteriormente identificado
 
@@ -43,8 +43,12 @@ Somente no cartão/firmware que já usa `/sdcard/fmg-test` e `/sdcard/simulator/
 
 Select salva e encerra para o menu original. Save próprio: `fmg-test/saves/pocket-beats.sav`; log `fmg-test/pocket-beats-teste.log`. No computador usa SDL_GetPrefPath, ou a pasta definida por FMG_SAVE_DIR. Gravação temporária e renomeação protegem contra arquivos parciais durante a gravação normal; não há garantia contra falha física do cartão.
 
-## Validação
+## Validação da revisão 0.4
 
-Quatro grupos específicos: regras/save, áudio dos quatro instrumentos e controles SDL com ambos os manches virtuais e reprodução independente da interface bloqueada. Build local também verificado com AddressSanitizer/UndefinedBehaviorSanitizer. Os 20 grupos do repositório passaram. A revisão 0.3 acrescenta ao teste de controles alteração de nota por gatilhos, captura digital, persistência e cancelamento do mapeamento. Screenshot de smoke renderizado e inspecionado; demonstração sonora gerada diretamente pelo sintetizador.
+Seis grupos específicos: regras/save; áudio de quatro instrumentos, três timbres, bateria independente, prévia e sequência; controles SDL com ambos os manches virtuais e L2/R2; reprodução com interface bloqueada; fluxo de edição e migração de saves; janela completa com marcação, cópia, colagem, play e saída.
 
-Pendente no M17: qualidade auditiva, mapeamento físico A/B/X/Y e ambos os manches, fluidez/FPS, ausência de cortes de áudio e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo no console.
+Build local com AddressSanitizer/UndefinedBehaviorSanitizer; conjunto completo do repositório com 22 grupos. Screenshots da grade, ações e sequência foram renderizados e inspecionados. O banco de sons é próprio, com três variações por instrumento e aproximadamente 5,7 MB, preparado antes de abrir o dispositivo. Som e mixagem não dependem do ciclo de desenho.
+
+Pendente no M17: qualidade auditiva, mapeamento físico A/B/X/Y, gatilhos e ambos os manches, fluidez/FPS, uso de CPU/memória, ausência de cortes de áudio e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo no console.
+
+O save atualizado POCKETBEATS2 aceita importação do POCKETBEATS1. Preserve uma cópia do save antes da primeira execução desta revisão: executáveis antigos não leem o formato novo. O arquivo adicional pocket-beats-controls.cfg guarda somente o aprendizado de L2/R2 deste jogo.

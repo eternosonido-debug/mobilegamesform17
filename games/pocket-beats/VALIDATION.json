@@ -1,8 +1,8 @@
 {
   "game": "Pocket Beats",
   "native_build": true,
-  "standalone_tests_passed": 4,
-  "repository_tests_passed": 20,
+  "standalone_tests_passed": 6,
+  "repository_tests_passed": 22,
   "sanitizers": [
     "AddressSanitizer",
     "UndefinedBehaviorSanitizer"
@@ -39,11 +39,18 @@
     "failures": [],
     "note": "Static compatibility inspection; not runtime or hardware test"
   },
-  "version": "0.3",
+  "version": "0.4",
   "ui_stall_audio_regression_passed": true,
   "user_feedback_previous_version": "0.1 was tested by the user: awkward interface and possible stutters",
   "sd_modified_this_revision": false,
   "pitch_button_editing_tested": true,
   "digital_trigger_learning_and_save_tested": true,
-  "physical_triggers_tested": false
+  "physical_triggers_tested": false,
+  "independent_drum_voices_tested": true,
+  "audition_without_transport_tested": true,
+  "timbres_per_track": 3,
+  "undo_copy_paste_tested": true,
+  "song_sequence_tested": true,
+  "legacy_save_migration_tested": true,
+  "full_window_edit_copy_play_save_tested": true
 }

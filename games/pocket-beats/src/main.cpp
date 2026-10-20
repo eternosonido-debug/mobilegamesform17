@@ -62,11 +62,26 @@ int main(int argc, char **argv) {
     Input input;
     const std::string mappingPath = folder + "/pocket-beats-controls.cfg";
     input.loadMapping(mappingPath);
+    {
+      ui::Canvas c(r);
+      c.rect(0, 0, 240, 136, ui::Paint(17, 23, 39));
+      c.centered(120, 62, "PREPARANDO SONS...", ui::Paint(101, 236, 199));
+      SDL_RenderPresent(r);
+    }
     Audio audio;
-    audio.sync(app.state.current(), app.state.playing);
+    audio.syncSession(app.state);
+    auto dispatch = [&](Control key) {
+      app.action(key);
+      audio.syncSession(app.state, app.restart);
+      if (app.previewRequested)
+        audio.audition(app.state.track, app.previewNote,
+                       app.state.current().timbre[app.state.track],
+                       app.state.current().volume[app.state.track]);
+    };
     std::signal(SIGINT, stop);
     std::signal(SIGTERM, stop);
-    Uint32 repeat = 0, lastSave = 0;
+    Uint32 repeat = 0, lastSave = 0, messageAt = 0;
+    std::string lastMessage;
     int oldx = 0, oldy = 0, frames = 0;
     while (!app.quit && !stopped) {
       SDL_Event e;
@@ -83,23 +98,20 @@ int main(int argc, char **argv) {
             continue;
           }
           if (choice != None) {
-            app.action(choice);
-            audio.sync(app.state.current(), app.state.playing, app.restart);
+            dispatch(choice);
           }
           continue;
         }
         Control key = input.event(e);
         if (key != None) {
-          app.action(key);
-          audio.sync(app.state.current(), app.state.playing, app.restart);
+          dispatch(key);
         }
       }
       auto d = input.direction();
       Uint32 now = SDL_GetTicks();
       if (!input.learning && (d.x || d.y)) {
         if (d.x != oldx || d.y != oldy || now >= repeat) {
-          app.action(d.x ? (d.x > 0 ? Right : Left) : (d.y > 0 ? Down : Up));
-          audio.sync(app.state.current(), app.state.playing, app.restart);
+          dispatch(d.x ? (d.x > 0 ? Right : Left) : (d.y > 0 ? Down : Up));
           repeat = now + ((d.x != oldx || d.y != oldy) ? 260 : 100);
         }
       }
@@ -113,7 +125,11 @@ int main(int argc, char **argv) {
           app.dirty = false;
         lastSave = now;
       }
-      if (!app.message.empty() && now - lastSave > 1400)
+      if (app.message != lastMessage) {
+        lastMessage = app.message;
+        messageAt = now;
+      }
+      if (!app.message.empty() && now - messageAt > 1800)
         app.message.clear();
       if (input.mappingChanged) {
         app.message = input.saveMapping(mappingPath) ? "L2 R2 SALVOS"
@@ -121,7 +137,8 @@ int main(int argc, char **argv) {
         input.mappingChanged = false;
         lastSave = now;
       }
-      render(r, app, audio.audibleStep(), audio.device != 0, input.learning);
+      render(r, app, audio.audibleStep(), audio.device != 0, input.learning,
+             audio.audibleSlot(), audio.audibleOrder());
       if (smoke && frames == 10 && !screenshot.empty()) {
         int width, height;
         SDL_GetRendererOutputSize(r, &width, &height);

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <vector>
 namespace pocketbeats {
 constexpr int tracks = 4, maxSteps = 32, slots = 3;
 static const char *const names[] = {"DRUMS", "BASS", "GUITAR", "SYNTH"};
@@ -13,8 +14,8 @@ inline std::string noteName(int track, int note) {
   if (note == 0)
     return "OFF";
   if (track == 0) {
-    static const char *drums[] = {"OFF", "BUM", "CX", "CH", "B+H",
-                                  "C+H", "CH",  "CH", "CH"};
+    static const char *drums[] = {"OFF", "BUM", "CX",  "B+C",
+                                  "CH",  "B+H", "C+H", "ALL"};
     return drums[note];
   }
   static const char *notes[] = {"OFF", "LA", "DO", "RE", "MI",
@@ -37,6 +38,7 @@ struct Pattern {
   std::array<int, tracks> volume{{80, 75, 65, 60}};
   std::array<bool, tracks> mute{{false, false, false, false}};
   int solo = -1;
+  std::array<int, tracks> timbre{{0, 0, 0, 0}};
   bool audible(int t) const {
     return t >= 0 && t < tracks && !mute[t] && (solo < 0 || solo == t);
   }
@@ -47,7 +49,8 @@ struct Pattern {
     return true;
   }
   bool setNote(int t, int s, int n) {
-    if (t < 0 || t >= tracks || s < 0 || s >= length || n < 0 || n > 8)
+    if (t < 0 || t >= tracks || s < 0 || s >= length || n < 0 ||
+        n > (t == 0 ? 7 : 8))
       return false;
     notes[t][s] = n;
     return true;
@@ -84,6 +87,9 @@ inline Pattern preset(int id) {
         p.notes[1][s] = 4;
     }
   }
+  static const int migrate[] = {0, 1, 2, 4, 5, 6, 4, 4, 4};
+  for (auto &n : p.notes[0])
+    n = migrate[n];
   return p;
 }
 enum class Scene { Menu, Tutorial, Playing, Paused };
@@ -91,7 +97,9 @@ struct Session {
   std::array<Pattern, slots> patterns;
   Scene scene = Scene::Menu;
   int slot = 0, track = 0, cursor = 0, menu = 0, setting = 0, pause = 0;
-  bool playing = false;
+  bool playing = false, preview = true, songMode = false;
+  int drumLane = 0, orderLength = 4;
+  std::array<int, 8> order{{0, 1, 2, 1, 0, 0, 0, 0}};
   Session() {
     for (int i = 0; i < slots; ++i)
       patterns[i] = preset(i);
@@ -100,7 +108,13 @@ struct Session {
   const Pattern &current() const { return patterns[slot]; }
   int page() const { return cursor / 8; }
   void move(int dx, int dy) {
-    track = (track + dy + tracks) % tracks;
+    int row = track == 0 ? drumLane : track + 2;
+    row = (row + dy + 6) % 6;
+    if (row < 3) {
+      track = 0;
+      drumLane = row;
+    } else
+      track = row - 2;
     cursor = (cursor + dx + current().length) % current().length;
   }
   void chooseSlot(int n) {
@@ -145,9 +159,16 @@ struct Session {
     std::ofstream f(tmp);
     if (!f)
       return false;
-    f << "POCKETBEATS1\n" << slot << ' ' << track << ' ' << cursor << '\n';
+    f << "POCKETBEATS2\n" << slot << ' ' << track << ' ' << cursor << '\n';
+    f << drumLane << ' ' << preview << ' ' << songMode << ' ' << orderLength;
+    for (int n : order)
+      f << ' ' << n;
+    f << '\n';
     for (const auto &p : patterns) {
       f << p.length << ' ' << p.bpm << ' ' << p.solo << '\n';
+      for (int style : p.timbre)
+        f << style << ' ';
+      f << '\n';
       for (int t = 0; t < tracks; ++t) {
         f << p.volume[t] << ' ' << p.mute[t];
         for (int n : p.notes[t])
@@ -166,17 +187,35 @@ struct Session {
     std::ifstream f(path);
     Session candidate;
     std::string magic;
-    if (!(f >> magic) || magic != "POCKETBEATS1" ||
+    if (!(f >> magic) || (magic != "POCKETBEATS1" && magic != "POCKETBEATS2") ||
         !(f >> candidate.slot >> candidate.track >> candidate.cursor))
       return false;
     if (candidate.slot < 0 || candidate.slot >= slots || candidate.track < 0 ||
         candidate.track >= tracks)
       return false;
+    bool modern = magic == "POCKETBEATS2";
+    if (modern) {
+      int prev, song;
+      if (!(f >> candidate.drumLane >> prev >> song >> candidate.orderLength) ||
+          candidate.drumLane < 0 || candidate.drumLane > 2 || prev < 0 ||
+          prev > 1 || song < 0 || song > 1 || candidate.orderLength < 1 ||
+          candidate.orderLength > 8)
+        return false;
+      candidate.preview = prev;
+      candidate.songMode = song;
+      for (int &v : candidate.order)
+        if (!(f >> v) || v < 0 || v >= slots)
+          return false;
+    }
     for (auto &p : candidate.patterns) {
       int len;
       if (!(f >> len >> p.bpm >> p.solo) || !p.resize(len) || p.bpm < 40 ||
           p.bpm > 240 || p.solo < -1 || p.solo >= tracks)
         return false;
+      if (modern)
+        for (int &style : p.timbre)
+          if (!(f >> style) || style < 0 || style > 2)
+            return false;
       for (int t = 0; t < tracks; ++t) {
         int mute;
         if (!(f >> p.volume[t] >> mute) || p.volume[t] < 0 ||
@@ -184,9 +223,15 @@ struct Session {
           return false;
         p.mute[t] = mute;
         for (int &n : p.notes[t])
-          if (!(f >> n) || n < 0 || n > 8)
+          if (!(f >> n) || n < 0 || n > (modern && t == 0 ? 7 : 8))
             return false;
       }
+    }
+    if (!modern) {
+      static const int migrate[] = {0, 1, 2, 4, 5, 6, 4, 4, 4};
+      for (auto &p : candidate.patterns)
+        for (int &n : p.notes[0])
+          n = migrate[n];
     }
     if (candidate.cursor < 0 || candidate.cursor >= candidate.current().length)
       return false;

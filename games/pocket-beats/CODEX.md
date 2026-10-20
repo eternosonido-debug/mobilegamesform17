@@ -32,3 +32,7 @@ Criar gráficos, sons, níveis e lógica de implementação próprios. A referê
 ## Atualização aprovada em 20/10/2026
 
 Sequência global ajustável de 4/8/16/32 passos, inicial 16; sem comprimento por instrumento. Primeira publicação inclui as quatro pistas com som e três beats prontos editáveis. A groovebox não tem vitória/derrota nem fases obrigatórias: usar três padrões reproduzíveis como cenários. Controles efetivos e testes estão documentados em README.md, BUILD.md e VALIDATION.json.
+
+## Implementação de usabilidade — revisão 0.4
+
+A marcação e a alteração de nota têm prévia sonora. A bateria tem três linhas independentes sob a mesma pista. Y abre seis ações, com timbres próprios gratuitos, copiar/colar até oito passos, desfazer, sequência de padrões e ajustes separados. O tamanho continua global para os quatro instrumentos. Save novo migra o formato anterior; validação física pendente. Não acrescentar controles escondidos ou combinações complexas para funções essenciais.

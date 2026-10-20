@@ -34,21 +34,23 @@ int main() {
     check(app.state.cursor == 2, "sticks navigation");
     int n = app.state.current().notes[0][2];
     app.action(A);
-    check(app.state.current().notes[0][2] == (n ? 0 : 1), "A toggle");
+    check(app.state.current().notes[0][2] == (n ^ 1), "A toggle");
     // Actual SDL events for pitch edits, learned digital triggers and rollback.
-    app.state.current().setNote(0, 2, 2);
+    app.state.track = 1;
+    app.state.current().setNote(1, 2, 2);
     e.key.keysym.sym = SDLK_e;
     app.action(input.event(e));
-    check(app.state.current().notes[0][2] == 3, "R2 keyboard note up");
+    check(app.state.current().notes[1][2] == 3 && app.previewRequested,
+          "R2 previews changed note");
     e.key.keysym.sym = SDLK_q;
     app.action(input.event(e));
-    check(app.state.current().notes[0][2] == 2, "L2 keyboard note down");
-    app.state.current().setNote(0, 2, 0);
+    check(app.state.current().notes[1][2] == 2, "L2 keyboard note down");
+    app.state.current().setNote(1, 2, 0);
     app.action(NoteDown);
-    check(app.state.current().notes[0][2] == 0, "empty step remains off");
-    app.state.current().setNote(0, 2, 1);
+    check(app.state.current().notes[1][2] == 0, "empty step remains off");
+    app.state.current().setNote(1, 2, 1);
     app.action(NoteDown);
-    check(app.state.current().notes[0][2] == 1, "lowest note remains on");
+    check(app.state.current().notes[1][2] == 1, "lowest note remains on");
     input.beginMapping();
     e = {};
     e.type = SDL_JOYBUTTONDOWN;
@@ -83,6 +85,9 @@ int main() {
     app.action(Start);
     check(app.state.playing, "transport");
     app.action(Y);
+    check(app.tools, "Y opens six action cards");
+    app.tool = 5;
+    app.action(A);
     app.action(Right);
     check(app.state.current().bpm == 105, "Y tempo");
     app.action(Down);
@@ -91,6 +96,8 @@ int main() {
     app.action(B);
     check(!app.settings && app.state.playing,
           "B closes settings while playing");
+    app.action(B);
+    check(!app.tools && app.state.playing, "B closes action cards");
     app.action(B);
     check(!app.state.playing && app.state.scene == Scene::Paused, "B pause");
     app.action(A);
