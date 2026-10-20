@@ -35,7 +35,9 @@ O registro inicial abaixo é histórico. Suas pendências sobre localizar fontes
 17. Minichef (culinária, recuperar conceito anterior)
 
 ## Ordem inicial aprovada
-Block Out → Screw Puzzle → Rotate Rings → Toon Blast → Stack Ball → demais.
+**Atualização de prioridade (20/10/2026): Block Out → Pocket Beats → Screw Puzzle → Rotate Rings → Toon Blast → Stack Ball → demais.**
+
+Block Out já possui implementação nativa inicial com nove fases, visual de peças de montar e saída com desintegração apenas após a porta. Testes locais e build estão documentados na [pasta do jogo](games/block-out); validação no M17 físico permanece pendente. Pocket Beats é o próximo a desenvolver.
 
 ## Pendências técnicas
 - Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.

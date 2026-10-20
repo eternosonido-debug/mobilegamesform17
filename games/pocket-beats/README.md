@@ -1,7 +1,9 @@
 # Pocket Beats
 
 **Status:** especificação aprovada para desenvolvimento; NÃO implementado/validado no M17.
-**Prioridade:** fila posterior.
+**Prioridade:** próximo projeto após Block Out, por decisão do usuário em 20/10/2026.
+
+A próxima etapa começa pela especificação de groovebox de 16 passos e quatro pistas; a implementação ainda não foi iniciada.
 
 ## Conceito e objetivo
 Groovebox com sequenciador de 16 passos e quatro pistas: bateria, baixo, guitarra e synth.

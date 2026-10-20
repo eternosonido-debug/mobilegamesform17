@@ -1,0 +1,20 @@
+{
+  "game": "Block Out",
+  "levels": 9,
+  "checks": {
+    "central_test_groups_passed": 16,
+    "standalone_test_groups_passed": 3,
+    "sanitizers": [
+      "AddressSanitizer",
+      "UndefinedBehaviorSanitizer"
+    ],
+    "all_levels_have_verified_solution": true,
+    "exit_visual_checks": "four directions, 6x6 and 8x8 grids",
+    "arm_build": "ARM gnueabi soft-float",
+    "strong_imports_checked": 535,
+    "arm_import_failures": 0
+  },
+  "hardware_tested": false,
+  "sd_modified": false,
+  "next_game": "Pocket Beats"
+}
