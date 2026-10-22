@@ -20,8 +20,9 @@ int main() {
   setenv("FMG_SAVE_DIR", folder, 1);
   std::string path = std::string(folder) + "/tower-break.save";
   tower::Game fixture;
-  fixture.state.layer = 17;
-  fixture.state.score = 170;
+  fixture.state.layer = tower::level(0).layers - 1;
+  fixture.state.ticks = tower::MinimumRunTicks;
+  fixture.state.score = 10 * fixture.state.layer;
   fixture.state.z = 1;
   fixture.state.velocity = -100;
   fixture.state.angle = 0;

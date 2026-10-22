@@ -1,7 +1,8 @@
-# Validação — Tower Break 0.1.0, 22/10/2026
+# Validação — Tower Break 0.2.0, 22/10/2026
 
 - Compilação Apple Clang/C++11 com SDL2, avisos `-Wall -Wextra -pedantic`, AddressSanitizer e UndefinedBehaviorSanitizer; testes sem diagnósticos.
 - Quatro grupos próprios aprovados: regras/torres/save; inicialização/desenho SDL sem tela; controles; retomada perto da base com vitória e desbloqueio no fluxo da aplicação.
+- Duração: torres de 640/680/720 andares. Limites inferiores calculados sem perigos de 186,59/198,26/209,92 s, todos maiores que 180 s. Simulações completas: 32.895/35.685/46.530 passos de 1/120 s. Teste verifica tempo mínimo e retomada do marco de 80 andares.
 - Regras: três torres concluídas por uma política de ataques seguros, presença de setores seguros/perigosos em cada plataforma, morte ao atacar perigo, rebote no perigo sem atacar, combos/pontuação, estado terminal sem continuar a simulação, save/retomada e rejeição de dados inválidos.
 - Tempo: estados idênticos ao agrupar os mesmos passos de física em frames simulados de 30 e 60 Hz. Isso verifica o modelo; não mede FPS no aparelho.
 - Controles: A mantido por teclado e botão de joystick virtual, botão bruto alternativo FMG_BUTTON_A, tecla alternativa FMG_KEY_A, limpeza ao perder foco, eixos dos dois manches, pausa/retorno e confirmação de saída com save.

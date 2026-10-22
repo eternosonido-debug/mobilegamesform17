@@ -1,4 +1,4 @@
-# Tower Break 0.1.0
+# Tower Break 0.2.0
 
 Jogo nativo C++11/SDL2 de descer uma torre quebrando plataformas, com três torres originais. A pasta `stack-ball` é histórica; o executável, o save e a entrada em Ports usam **Tower Break**. Arte, sons e níveis próprios, sem copiar código/assets dos candidatos pesquisados.
 
@@ -12,9 +12,13 @@ Cada plataforma quebrada aumenta o combo; rebater sem atacar zera o combo. Os po
 
 | Torre | Plataformas | Setores perigosos em 12 | Rotação automática |
 |---|---:|---:|---:|
-| 1 | 18 | 2 | 72 graus/s |
-| 2 | 24 | 3 | 108 graus/s |
-| 3 | 30 | 4 | 144 graus/s |
+| 1 | 640 | 2 | 72 graus/s |
+| 2 | 680 | 3 | 108 graus/s |
+| 3 | 720 | 4 | 144 graus/s |
+
+A conclusão exige pelo menos 3 minutos de jogo ativo. Não há espera artificial na base: são torres mais longas, com limite vertical de 700 milésimos de pixel por passo e distância de 24.000 entre quebras. Mesmo supondo velocidade máxima instantânea e nenhum perigo, os limites inferiores são 186,59 s, 198,26 s e 209,92 s. Menus e pausas não avançam a física nem o relógio mostrado na tela. As simulações com ataques seguros terminaram em 274,13 s, 297,38 s e 387,75 s; não são tempos mínimos nem medidas em hardware.
+
+Há um marco a cada 80 andares. Na derrota, A retoma do último marco, mantendo o tempo ativo acumulado; reiniciar pelo menu começa a torre do zero. Saves da versão anterior mantêm andares já quebrados e desbloqueios, mas passam a usar as torres longas; a velocidade antiga é limitada ao novo máximo. O formato novo é TOWER2 e lê também TOWER1.
 
 As posições dos perigos mudam entre plataformas por uma regra fixa versionada. As três torres foram concluídas na simulação das regras com uma sequência de ataques seguros. Isso prova alcance da base no modelo, sem medir a dificuldade percebida nem substituir teste humano.
 

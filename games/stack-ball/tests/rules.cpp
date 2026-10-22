@@ -25,10 +25,22 @@ int main() {
     for (int tick = 0; tick < 120000 && !won(g.state, stage); ++tick)
       g.advance(policy(g.state, stage));
     assert(won(g.state, stage) && !g.state.dead);
+    assert(g.state.ticks >= MinimumRunTicks);
+    int bound = (InitialHeight + MaxFallSpeed - 1) / MaxFallSpeed +
+                (level(stage).layers - 1) *
+                    ((FloorGap + MaxFallSpeed - 1) / MaxFallSpeed);
+    assert(bound >= MinimumRunTicks);
     assert(g.unlocked == std::min(2, stage + 1));
     std::cout << "Torre " << stage + 1 << ": " << g.state.layer << " andares, "
               << g.state.ticks << " passos fixos verificados\n";
   }
+  Game checkpoint;
+  checkpoint.state.layer = 173;
+  checkpoint.state.ticks = 10000;
+  checkpoint.state.dead = true;
+  checkpoint.retry();
+  assert(checkpoint.state.layer == 160 && checkpoint.state.ticks == 10000 &&
+         !checkpoint.state.dead);
   State left, right;
   step(left, 0, false, -1);
   step(right, 0, false, 1);

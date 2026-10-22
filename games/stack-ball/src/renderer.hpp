@@ -151,6 +151,11 @@ struct Renderer {
     c.centered(193, 59, bad ? "PERIGO" : "SEGURO", paper);
     c.text(156, 81, "PTS " + std::to_string(g.state.score), paper);
     c.text(156, 96, "COMBO " + std::to_string(g.state.combo), color(1, 0));
+    unsigned seconds = g.state.ticks / 120;
+    c.text(156, 108,
+           "TEMPO " + std::to_string(seconds / 60) + ":" +
+               (seconds % 60 < 10 ? "0" : "") + std::to_string(seconds % 60),
+           Paint(166, 185, 202));
     c.text(8, 117, "SEGURE A: CAIR  SOLTE: FREAR", paper);
     c.text(8, 127, "START PAUSA   SELECT SAIR", Paint(166, 185, 202));
   }

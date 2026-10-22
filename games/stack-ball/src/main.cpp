@@ -146,7 +146,10 @@ int main(int argc, char **argv) {
             scene = Menu;
             choice = 0;
           } else {
-            g.begin(scene == Won ? g.stage + 1 : g.stage);
+            if (scene == Won)
+              g.begin(g.stage + 1);
+            else
+              g.retry();
             render.restart();
             settle = 0;
             resume();

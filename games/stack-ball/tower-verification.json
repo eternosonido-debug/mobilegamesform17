@@ -1,22 +1,25 @@
 {
-  "fixed_step_hz": 120,
-  "policy": "press only when a one-step lookahead reports a safe break; otherwise release",
+  "minimum_active_seconds": 180,
+  "proof": "first floor >= ceil(18000/700) ticks; each remaining floor >= ceil(24000/700) ticks; 120 ticks/s",
   "runs": [
     {
       "tower": 1,
-      "platforms": 18,
-      "ticks": 716
+      "platforms": 640,
+      "minimum_ticks_bound": 22391,
+      "safe_policy_ticks": 32895
     },
     {
       "tower": 2,
-      "platforms": 24,
-      "ticks": 1013
+      "platforms": 680,
+      "minimum_ticks_bound": 23791,
+      "safe_policy_ticks": 35685
     },
     {
       "tower": 3,
-      "platforms": 30,
-      "ticks": 1715
+      "platforms": 720,
+      "minimum_ticks_bound": 25191,
+      "safe_policy_ticks": 46530
     }
   ],
-  "note": "Rules simulation only, not a hardware test or a minimum-time claim"
+  "hardware_test": false
 }
