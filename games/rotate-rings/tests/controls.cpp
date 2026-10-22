@@ -48,8 +48,9 @@ int main() {
   rings::Game saved;
   std::string path = std::string(folder) + "/rotate-rings.save";
   bool ok = result == 0 && saved.load(path) && saved.selected == 0 &&
-            saved.state.moves == 2 && saved.state.angle[0] == 7 &&
-            saved.state.angle[1] == 4;
+            saved.state.moves == 2 &&
+            saved.state.angle[0] == rings::initial(0).angle[0] + 1 &&
+            saved.state.angle[1] == rings::initial(0).angle[1] + 1;
   std::remove(path.c_str());
   rmdir(folder);
   std::cout << (ok ? "PASS" : "FAIL")

@@ -1,0 +1,102 @@
+[
+  {
+    "level": 1,
+    "rings": 2,
+    "minimum_turns_astar": 2
+  },
+  {
+    "level": 2,
+    "rings": 3,
+    "minimum_turns_astar": 4
+  },
+  {
+    "level": 3,
+    "rings": 4,
+    "minimum_turns_astar": 6
+  },
+  {
+    "level": 4,
+    "rings": 4,
+    "minimum_turns_astar": 8
+  },
+  {
+    "level": 5,
+    "rings": 4,
+    "minimum_turns_astar": 9
+  },
+  {
+    "level": 6,
+    "rings": 4,
+    "minimum_turns_astar": 10
+  },
+  {
+    "level": 7,
+    "rings": 4,
+    "minimum_turns_astar": 11
+  },
+  {
+    "level": 8,
+    "rings": 4,
+    "minimum_turns_astar": 12
+  },
+  {
+    "level": 9,
+    "rings": 4,
+    "minimum_turns_astar": 13
+  },
+  {
+    "level": 10,
+    "rings": 4,
+    "minimum_turns_astar": 14
+  },
+  {
+    "level": 11,
+    "rings": 4,
+    "minimum_turns_astar": 15
+  },
+  {
+    "level": 12,
+    "rings": 4,
+    "minimum_turns_astar": 16
+  },
+  {
+    "level": 13,
+    "rings": 4,
+    "minimum_turns_astar": 17
+  },
+  {
+    "level": 14,
+    "rings": 4,
+    "minimum_turns_astar": 18
+  },
+  {
+    "level": 15,
+    "rings": 5,
+    "minimum_turns_astar": 19
+  },
+  {
+    "level": 16,
+    "rings": 5,
+    "minimum_turns_astar": 20
+  },
+  {
+    "level": 17,
+    "rings": 5,
+    "minimum_turns_astar": 21
+  },
+  {
+    "level": 18,
+    "rings": 5,
+    "minimum_turns_astar": 22
+  },
+  {
+    "level": 19,
+    "rings": 5,
+    "minimum_turns_astar": 23
+  },
+  {
+    "level": 20,
+    "rings": 5,
+    "minimum_turns_astar": 24
+  }
+]

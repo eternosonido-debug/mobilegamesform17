@@ -1,6 +1,6 @@
-# Rotate Rings 0.1.1
+# Rotate Rings 0.2.0
 
-Puzzle nativo C++11/SDL2 com quatro fases originais. Gire anéis abertos para passar pelos pinos e desencaixar as conexões com outros anéis. Inclui rotação suave, saída animada, efeitos sonoros, tutorial, pausa, desfazer, desbloqueio e save separado. Offline, sem mouse ou toque.
+Puzzle nativo C++11/SDL2 com 20 fases originais. Gire anéis abertos para passar pelos pinos e desencaixar as conexões com outros anéis. Inclui rotação suave, saída animada, efeitos sonoros, tutorial, pausa, desfazer, desbloqueio e save separado. Offline, sem mouse ou toque.
 
 ## Regras
 
@@ -22,16 +22,34 @@ Teclado: setas, Z/espaço=A, X=B, V=Y, Enter=Start, Escape=Select. A entrada res
 
 ## Fases
 
-| Fase | Anéis | Desafio | Solução construtiva verificada |
-|---|---:|---|---:|
-| 1 | 2 | Aprender a alinhar abertura, pino e conexão | 8 giros |
-| 2 | 3 | Escolher a ordem de uma corrente | 11 giros |
-| 3 | 4 | Corrente dobrada, com conexões em direções diferentes | 23 giros |
-| 4 | 4 | Circuito fechado: usar uma abertura para ajudar outra | 24 giros |
+| Fase | Anéis | Mínimo de giros verificado |
+|---|---:|---:|
+| 1 | 2 | 2 |
+| 2 | 3 | 4 |
+| 3 | 4 | 6 |
+| 4 | 4 | 8 |
+| 5 | 4 | 9 |
+| 6 | 4 | 10 |
+| 7 | 4 | 11 |
+| 8 | 4 | 12 |
+| 9 | 4 | 13 |
+| 10 | 4 | 14 |
+| 11 | 4 | 15 |
+| 12 | 4 | 16 |
+| 13 | 4 | 17 |
+| 14 | 4 | 18 |
+| 15 | 5 | 19 |
+| 16 | 5 | 20 |
+| 17 | 5 | 21 |
+| 18 | 5 | 22 |
+| 19 | 5 | 23 |
+| 20 | 5 | 24 |
 
-Os números são comprimentos das sequências produzidas e reproduzidas pelo verificador; não são provas de solução mínima. A dificuldade percebida precisa de avaliação humana. Completar uma fase desbloqueia a próxima; o menu permite trocar entre as fases liberadas, reiniciar, silenciar e sair.
+A progressão começa com dois anéis, passa por correntes e circuitos com quatro e termina com cinco anéis. Cada fase exige mais giros na solução mínima que a anterior: 2, 4, 6, 8 e depois de 9 até 24. A busca A* nos testes calcula o mínimo sob as regras discretas do jogo; cada fase também possui uma sequência construtiva reproduzida até a vitória. O algoritmo usa como estimativa admissível os giros mínimos independentes para alinhar os pinos e não roda no aparelho durante a partida. Quantidade mínima de giros é uma medida objetiva de progressão, mas não garante como cada pessoa perceberá a dificuldade. As posições iniciais foram recalibradas; fases 1–4 mantêm sua geometria para importar as partidas anteriores.
 
-O arquivo `rotate-rings.save` guarda fase, seleção, ângulos, anéis restantes, giros, desbloqueios e som. A gravação usa arquivo temporário e rename. O histórico de desfazer é limitado a 128 ações e existe apenas na sessão atual. Saves da versão 0.1.0 são importados com progresso e ângulos preservados; se o maior espaçamento liberar uma conexão, ela é normalizada ao carregar. O formato novo é RINGS2. Um save inválido é rejeitado e inicia-se uma partida nova. Saves dos outros jogos não são lidos nem modificados.
+Completar uma fase desbloqueia a próxima; o menu identifica a fase atual e permite trocar entre as liberadas, reiniciar, silenciar e sair. A etapa 20 encerra a campanha.
+
+O arquivo `rotate-rings.save` guarda fase, seleção, ângulos, anéis restantes, giros, desbloqueios e som. A gravação usa arquivo temporário e rename. O histórico de desfazer é limitado a 128 ações e existe apenas na sessão atual. Saves das versões 0.1.0 e 0.1.1 são importados com progresso e ângulos preservados; se o maior espaçamento liberar uma conexão, ela é normalizada ao carregar. O formato novo é RINGS3 e guarda os cinco ângulos; os formatos antigos RINGS1/RINGS2, com quatro ângulos, continuam legíveis. Um save inválido é rejeitado e inicia-se uma partida nova. Saves dos outros jogos não são lidos nem modificados.
 
 ## Entrega e fontes
 
@@ -39,6 +57,6 @@ O arquivo `rotate-rings.save` guarda fase, seleção, ângulos, anéis restantes
 - `src/renderer.hpp`: texturas próprias geradas uma vez em memória, desenho e animações. Os giros reaproveitam as texturas, evitando redesenhar arcos ponto a ponto a cada frame.
 - `src/input.hpp`, `src/audio.hpp`, `src/pixel.hpp`: componentes próprios reaproveitados da coleção, sob [LICENSE-FMG](../../LICENSE-FMG).
 - `src/main.cpp`: menu, tutorial, jogo, pausa, vitória e conclusão da campanha.
-- `tests/`: regras, save, controles com manches virtuais, vitória/desbloqueio pelo fluxo SDL.
+- `tests/`: regras, mínimo de giros por A*, save, controles com manches virtuais, vitória/desbloqueio pelo fluxo SDL.
 
 Veja [BUILD.md](BUILD.md), [VALIDACAO.md](VALIDACAO.md) e [REFERENCIAS.md](REFERENCIAS.md). Nenhum código, nível ou asset externo foi copiado. **Compilado para ARM e testado no computador; execução física no M17 pendente.** Não instalado no cartão nesta entrega.

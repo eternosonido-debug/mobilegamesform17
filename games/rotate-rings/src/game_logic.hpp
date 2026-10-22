@@ -20,10 +20,50 @@ struct Level {
 };
 inline const std::vector<Level> &levels() {
   static const std::vector<Level> l = {
-      {{{60, 65, 0, 6}, {92, 65, 6, 3}}},
-      {{{40, 65, 0, 5}, {72, 65, 0, 4}, {104, 65, 6, 9}}},
-      {{{44, 43, 0, 6}, {76, 43, 3, 9}, {76, 75, 0, 6}, {108, 75, 6, 0}}},
-      {{{58, 43, 0, 6}, {90, 43, 3, 9}, {90, 75, 6, 0}, {58, 75, 9, 3}}}};
+      {{{60, 65, 0, 2}, {92, 65, 6, 8}}},
+      {{{40, 65, 0, 2}, {72, 65, 0, 2}, {104, 65, 6, 8}}},
+      {{{44, 43, 0, 2}, {76, 43, 3, 5}, {76, 75, 0, 2}, {108, 75, 6, 8}}},
+      {{{58, 43, 0, 2}, {90, 43, 3, 5}, {90, 75, 6, 9}, {58, 75, 9, 11}}},
+      {{{40, 43, 0, 5}, {72, 43, 6, 8}, {104, 43, 6, 8}, {72, 75, 9, 11}}},
+      {{{40, 43, 0, 6}, {72, 43, 6, 8}, {104, 43, 6, 8}, {104, 75, 9, 11}}},
+      {{{40, 43, 0, 2}, {72, 43, 3, 9}, {40, 75, 9, 11}, {72, 75, 6, 8}}},
+      {{{40, 43, 0, 4}, {72, 43, 6, 0}, {72, 75, 9, 11}, {104, 75, 6, 8}}},
+      {{{72, 43, 0, 6}, {104, 43, 6, 0}, {40, 75, 0, 2}, {72, 75, 9, 11}}},
+      {{{72, 43, 0, 6}, {104, 43, 3, 9}, {72, 75, 9, 11}, {104, 75, 6, 8}}},
+      {{{104, 43, 0, 6}, {40, 75, 0, 6}, {72, 75, 0, 4}, {104, 75, 9, 11}}},
+      {{{40, 43, 0, 6}, {72, 43, 6, 0}, {104, 43, 6, 0}, {40, 75, 9, 11}}},
+      {{{40, 43, 0, 6}, {40, 75, 9, 3}, {72, 75, 6, 11}, {104, 75, 6, 9}}},
+      {{{72, 43, 0, 6}, {40, 75, 0, 6}, {72, 75, 9, 3}, {104, 75, 6, 9}}},
+      {{{40, 43, 0, 6},
+        {72, 43, 0, 6},
+        {104, 43, 3, 9},
+        {72, 75, 9, 11},
+        {104, 75, 6, 8}}},
+      {{{40, 43, 0, 6},
+        {72, 43, 3, 9},
+        {40, 75, 9, 3},
+        {72, 75, 6, 9},
+        {104, 75, 6, 8}}},
+      {{{40, 43, 0, 6},
+        {104, 43, 3, 9},
+        {40, 75, 9, 3},
+        {72, 75, 6, 11},
+        {104, 75, 6, 8}}},
+      {{{72, 43, 0, 6},
+        {104, 43, 3, 9},
+        {40, 75, 0, 6},
+        {72, 75, 9, 2},
+        {104, 75, 6, 8}}},
+      {{{40, 43, 0, 6},
+        {72, 43, 3, 9},
+        {104, 43, 6, 0},
+        {40, 75, 9, 3},
+        {72, 75, 6, 9}}},
+      {{{40, 43, 0, 6},
+        {72, 43, 6, 0},
+        {104, 43, 6, 0},
+        {40, 75, 9, 3},
+        {104, 75, 9, 2}}}};
   return l;
 }
 inline double radians(int step) { return step * pi / 6; }
@@ -34,7 +74,7 @@ inline bool opening(int orientation, double angle) {
   return distanceAngle(radians(orientation), angle) <= gapHalf + 1e-8;
 }
 struct State {
-  std::array<int, 4> angle{{0, 0, 0, 0}};
+  std::array<int, 5> angle{{0, 0, 0, 0, 0}};
   unsigned active = 0;
   int moves = 0;
 };
@@ -180,7 +220,7 @@ struct Game {
   bool save(const std::string &path) const {
     std::string tmp = path + ".tmp";
     std::ofstream f(tmp);
-    f << "RINGS2 " << level << ' ' << selected << ' ' << unlocked << ' '
+    f << "RINGS3 " << level << ' ' << selected << ' ' << unlocked << ' '
       << muted << ' ' << state.active << ' ' << state.moves;
     for (int a : state.angle)
       f << ' ' << a;
@@ -194,19 +234,23 @@ struct Game {
     Game g;
     if (!(f >> magic >> g.level >> g.selected >> g.unlocked >> g.muted >>
           g.state.active >> g.state.moves) ||
-        (magic != "RINGS1" && magic != "RINGS2") || g.level < 0 ||
-        g.level >= int(levels().size()) || g.selected < 0 ||
+        (magic != "RINGS1" && magic != "RINGS2" && magic != "RINGS3") ||
+        g.level < 0 || g.level >= int(levels().size()) || g.selected < 0 ||
         g.selected >= int(levels()[g.level].rings.size()) ||
         g.unlocked < g.level || g.unlocked >= int(levels().size()) ||
         g.state.moves < 0 ||
         g.state.active & ~((1u << levels()[g.level].rings.size()) - 1))
       return false;
-    for (int &a : g.state.angle)
-      if (!(f >> a) || a < 0 || a >= 12)
+    if (magic != "RINGS3" && g.level >= 4)
+      return false;
+    int count = magic == "RINGS3" ? 5 : 4;
+    for (int i = 0; i < count; ++i)
+      if (!(f >> g.state.angle[i]) || g.state.angle[i] < 0 ||
+          g.state.angle[i] >= 12)
         return false;
     auto normalized = g.state;
     release(levels()[g.level], normalized);
-    if (normalized.active != g.state.active && magic == "RINGS2")
+    if (normalized.active != g.state.active && magic != "RINGS1")
       return false;
     // Preserve old progress when the wider spacing clears a connection.
     g.state = normalized;

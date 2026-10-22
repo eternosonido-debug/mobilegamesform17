@@ -4,7 +4,8 @@
 namespace rings {
 struct Renderer {
   ui::Canvas c;
-  std::array<SDL_Texture *, 4> textures{{nullptr, nullptr, nullptr, nullptr}};
+  std::array<SDL_Texture *, 5> textures{
+      {nullptr, nullptr, nullptr, nullptr, nullptr}};
   float timer = 1, error = 0;
   unsigned released = 0;
   int turning = -1, direction = 0;
@@ -12,11 +13,12 @@ struct Renderer {
   static ui::Paint color(int i) {
     const ui::Paint colors[] = {
         ui::Paint(240, 109, 125), ui::Paint(69, 193, 215),
-        ui::Paint(249, 194, 78), ui::Paint(158, 130, 240)};
+        ui::Paint(249, 194, 78), ui::Paint(158, 130, 240),
+        ui::Paint(98, 210, 141)};
     return colors[i];
   }
   explicit Renderer(SDL_Renderer *r) : c(r) {
-    for (int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 5; ++k) {
       auto *s = SDL_CreateRGBSurfaceWithFormat(0, 48, 48, 32,
                                                SDL_PIXELFORMAT_ARGB8888);
       if (!s)
@@ -72,7 +74,7 @@ struct Renderer {
     using namespace ui;
     c.rect(0, 0, 240, 136, Paint(19, 27, 41));
     c.text(8, 5, "ROTATE RINGS", paper);
-    c.text(165, 5, "FASE " + std::to_string(g.level + 1), paper);
+    c.text(165, 5, "FASE " + std::to_string(g.level + 1) + "/20", paper);
     c.round(7, 20, 142, 91, 5, Paint(30, 43, 60));
     for (int y = 26; y < 109; y += 8)
       for (int x = 13; x < 146; x += 8)
@@ -151,7 +153,7 @@ struct Renderer {
            Paint(112, 225, 193));
     c.text(158, 53, "GIROS " + std::to_string(g.state.moves), paper);
     c.text(158, 68, "SELECIONADO", paper);
-    const char *names[] = {"ROSA", "AZUL", "AMARELO", "ROXO"};
+    const char *names[] = {"ROSA", "AZUL", "AMARELO", "ROXO", "VERDE"};
     c.text(158, 80, names[g.selected], color(g.selected));
     c.text(158, 96, "PINO", Paint(167, 186, 209));
     c.disc(190, 99, 3, color(g.selected));

@@ -17,7 +17,7 @@ Também há Makefile na pasta do jogo. Para teste sem tela nem áudio físico:
 SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software SDL_AUDIODRIVER=dummy ./build/rotate-rings/rotate-rings --smoke
 ```
 
-A interface usa canvas lógico 240 × 136, escalado 2x sem suavização para 480 × 272. As quatro fases usam duas a quatro peças; as texturas dos anéis são geradas na inicialização e giradas pela SDL.
+A interface usa canvas lógico 240 × 136, escalado 2x sem suavização para 480 × 272. As 20 fases usam duas a cinco peças; as texturas dos anéis são geradas na inicialização e giradas pela SDL.
 
 ## Cross-compile confirmado para a unidade anterior
 

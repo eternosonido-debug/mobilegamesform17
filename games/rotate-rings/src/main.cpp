@@ -193,7 +193,8 @@ int main(int argc, char **argv) {
         render.draw(g);
       else if (scene == Menu || scene == Paused)
         render.panel(scene == Menu ? "ROTATE RINGS" : "PAUSA",
-                     {"CONTINUAR", "REINICIAR FASE", "TROCAR FASE",
+                     {"CONTINUAR", "REINICIAR FASE",
+                      "FASE " + std::to_string(g.level + 1) + "/20",
                       g.muted ? "SOM: DESLIGADO" : "SOM: LIGADO",
                       "SALVAR E SAIR"},
                      choice);
