@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
- project(RotateRings VERSION 0.1.0 LANGUAGES CXX)
+ project(RotateRings VERSION 0.1.1 LANGUAGES CXX)
  include(CTest)
 endif()
 find_package(SDL2 REQUIRED CONFIG)

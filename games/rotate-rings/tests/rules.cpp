@@ -45,6 +45,11 @@ int main() {
   std::ofstream("rings-test.save") << "RINGS1 99";
   assert(!restored.load("rings-test.save"));
   assert(restored.state.angle == g.state.angle);
+  // Import the previous save format without discarding progress or angles.
+  std::ofstream("rings-test.save") << "RINGS1 0 0 0 1 3 2 7 4 0 0";
+  assert(restored.load("rings-test.save"));
+  assert(restored.state.moves == 2 && restored.state.angle[0] == 7 &&
+         restored.muted);
   std::remove("rings-test.save");
   // An opening on either ring can clear their shared crossing; solid material
   // on both blocks it.

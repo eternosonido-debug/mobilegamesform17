@@ -1,4 +1,4 @@
-# Rotate Rings 0.1.0
+# Rotate Rings 0.1.1
 
 Puzzle nativo C++11/SDL2 com quatro fases originais. Gire anéis abertos para passar pelos pinos e desencaixar as conexões com outros anéis. Inclui rotação suave, saída animada, efeitos sonoros, tutorial, pausa, desfazer, desbloqueio e save separado. Offline, sem mouse ou toque.
 
@@ -6,7 +6,7 @@ Puzzle nativo C++11/SDL2 com quatro fases originais. Gire anéis abertos para pa
 
 Cada giro tem 30 graus, com 12 posições possíveis. Cada anel possui uma abertura de 90 graus e um pino fixo da mesma peça no tabuleiro. O anel sai automaticamente quando a abertura está alinhada com seu pino e os cruzamentos com todos os anéis restantes estão livres. Em cada ponto de cruzamento, basta que a abertura de um dos dois anéis permita a passagem. Portanto, girar um anel também pode ajudar a libertar outro. A seleção passa para um anel restante depois da animação.
 
-O objetivo é soltar todos os anéis. Não há tempo limite nem vidas. Pode desfazer ou reiniciar sem penalidade. A geometria calcula as duas interseções entre circunferências; não simula física 3D nem colisão contínua ao longo da trajetória de saída. Os giros são permitidos para explorar alinhamentos; o teste geométrico decide a liberação. Os pinos dourados continuam visíveis e os cantos claros indicam o anel selecionado.
+O objetivo é soltar todos os anéis. Não há tempo limite nem vidas. Pode desfazer ou reiniciar sem penalidade. A geometria calcula as duas interseções entre circunferências; não simula física 3D nem colisão contínua ao longo da trajetória de saída. Os giros são permitidos para explorar alinhamentos; o teste geométrico decide a liberação. Os pinos usam a cor de cada anel. O anel selecionado fica mais iluminado, com centro da mesma cor, cantos claros e nome na lateral; uma seta branca indica sua abertura. A ordem visual das camadas permanece fixa ao selecionar outra peça. Os centros estão mais afastados, reduzindo as sobreposições, e os arcos possuem contorno escuro.
 
 ## Controles
 
@@ -31,7 +31,7 @@ Teclado: setas, Z/espaço=A, X=B, V=Y, Enter=Start, Escape=Select. A entrada res
 
 Os números são comprimentos das sequências produzidas e reproduzidas pelo verificador; não são provas de solução mínima. A dificuldade percebida precisa de avaliação humana. Completar uma fase desbloqueia a próxima; o menu permite trocar entre as fases liberadas, reiniciar, silenciar e sair.
 
-O arquivo `rotate-rings.save` guarda fase, seleção, ângulos, anéis restantes, giros, desbloqueios e som. A gravação usa arquivo temporário e rename. O histórico de desfazer é limitado a 128 ações e existe apenas na sessão atual. Um save inválido é rejeitado e inicia-se uma partida nova. Saves dos outros jogos não são lidos nem modificados.
+O arquivo `rotate-rings.save` guarda fase, seleção, ângulos, anéis restantes, giros, desbloqueios e som. A gravação usa arquivo temporário e rename. O histórico de desfazer é limitado a 128 ações e existe apenas na sessão atual. Saves da versão 0.1.0 são importados com progresso e ângulos preservados; se o maior espaçamento liberar uma conexão, ela é normalizada ao carregar. O formato novo é RINGS2. Um save inválido é rejeitado e inicia-se uma partida nova. Saves dos outros jogos não são lidos nem modificados.
 
 ## Entrega e fontes
 

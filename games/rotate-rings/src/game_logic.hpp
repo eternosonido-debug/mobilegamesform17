@@ -20,10 +20,10 @@ struct Level {
 };
 inline const std::vector<Level> &levels() {
   static const std::vector<Level> l = {
-      {{{60, 65, 0, 6}, {88, 65, 6, 3}}},
-      {{{44, 65, 0, 5}, {72, 65, 0, 4}, {100, 65, 6, 9}}},
-      {{{48, 43, 0, 6}, {76, 43, 3, 9}, {76, 71, 0, 6}, {104, 71, 6, 0}}},
-      {{{60, 43, 0, 6}, {88, 43, 3, 9}, {88, 71, 6, 0}, {60, 71, 9, 3}}}};
+      {{{60, 65, 0, 6}, {92, 65, 6, 3}}},
+      {{{40, 65, 0, 5}, {72, 65, 0, 4}, {104, 65, 6, 9}}},
+      {{{44, 43, 0, 6}, {76, 43, 3, 9}, {76, 75, 0, 6}, {108, 75, 6, 0}}},
+      {{{58, 43, 0, 6}, {90, 43, 3, 9}, {90, 75, 6, 0}, {58, 75, 9, 3}}}};
   return l;
 }
 inline double radians(int step) { return step * pi / 6; }
@@ -180,7 +180,7 @@ struct Game {
   bool save(const std::string &path) const {
     std::string tmp = path + ".tmp";
     std::ofstream f(tmp);
-    f << "RINGS1 " << level << ' ' << selected << ' ' << unlocked << ' '
+    f << "RINGS2 " << level << ' ' << selected << ' ' << unlocked << ' '
       << muted << ' ' << state.active << ' ' << state.moves;
     for (int a : state.angle)
       f << ' ' << a;
@@ -194,8 +194,9 @@ struct Game {
     Game g;
     if (!(f >> magic >> g.level >> g.selected >> g.unlocked >> g.muted >>
           g.state.active >> g.state.moves) ||
-        magic != "RINGS1" || g.level < 0 || g.level >= int(levels().size()) ||
-        g.selected < 0 || g.selected >= int(levels()[g.level].rings.size()) ||
+        (magic != "RINGS1" && magic != "RINGS2") || g.level < 0 ||
+        g.level >= int(levels().size()) || g.selected < 0 ||
+        g.selected >= int(levels()[g.level].rings.size()) ||
         g.unlocked < g.level || g.unlocked >= int(levels().size()) ||
         g.state.moves < 0 ||
         g.state.active & ~((1u << levels()[g.level].rings.size()) - 1))
@@ -205,8 +206,13 @@ struct Game {
         return false;
     auto normalized = g.state;
     release(levels()[g.level], normalized);
-    if (normalized.active != g.state.active)
+    if (normalized.active != g.state.active && magic == "RINGS2")
       return false;
+    // Preserve old progress when the wider spacing clears a connection.
+    g.state = normalized;
+    if (!g.state.active)
+      g.unlocked =
+          std::max(g.unlocked, std::min(int(levels().size()) - 1, g.level + 1));
     g.selectAlive();
     *this = g;
     return true;
