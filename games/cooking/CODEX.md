@@ -1,0 +1,3 @@
+# Cooking — escopo aprovado pelo pedido e pelas referências
+
+Jogo independente do Minichef. Confeitaria tátil por etapas inspirada nas capturas fornecidas: selecionar ingredientes, colocá-los na tigela, misturar, preencher formas, assar e decorar livremente. Adaptação para M17/EmuELEC offline, C++11/SDL2, 480×272, ambos os manches/D-pad, A principal, B secundário, Y extra. Não exigir toque. Personagens, cenário, sons e doces originais, com cores e animações de videogame 16-bit. Implementar três sabores reproduzíveis, menu/tutorial/pausa/final/refazer/sair, progresso salvo e álbum. Testar regras, controles, retomada e fluxo completo antes de publicar. Nunca alegar teste físico sem execução real.

@@ -75,3 +75,5 @@ Magic Tiles ganhou uma [primeira versão nativa](games/magic-tiles) com dez mús
 - **Entrega por título**: mecânica funcional → teste no M17 → refinamento visual → menu próprio → capa no seletor. Não confundir protótipo HTML com binário Linux instalado.
 
 Minichef possui uma [primeira versão nativa](games/minichef), com três receitas desbloqueáveis, cinco etapas interativas, chef coelhinho, cozinha de fazendinha em 480×272, animações, estrelas e retomada do preparo. ARM compilado; validação no M17 pendente.
+
+Cooking é um [novo jogo independente](games/cooking) de confeitaria livre, com três sabores, ingredientes animados, mistura, quatro formas, forno, personalização individual dos doces e álbum local. Arte original colorida em 480×272; ARM compilado e teste físico pendente.
