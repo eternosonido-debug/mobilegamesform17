@@ -41,6 +41,8 @@ Block Out já possui implementação nativa inicial com nove fases, visual de pe
 
 Screw Puzzle também possui agora uma [primeira versão nativa jogável](games/screw-puzzle), com três fases de placas sobrepostas, soluções verificadas, animações e save. Build ARM gerado; validação física pendente.
 
+Rotate Rings ganhou uma [primeira versão nativa](games/rotate-rings), com quatro fases originais, geometria de liberação, animações, desfazer e progresso salvo. Build ARM compilado; teste no aparelho pendente.
+
 ## Pendências técnicas
 - Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.
 - Portar o Block Out de protótipo HTML para o mesmo stack nativo adotado nos jogos existentes; testar controles e desempenho no console.
