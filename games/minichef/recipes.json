@@ -1,0 +1,46 @@
+{
+  "source_of_truth": "src/game_logic.hpp",
+  "recipes": [
+    {
+      "name": "Sopa da Horta",
+      "ingredients": [
+        "cenoura",
+        "tomate",
+        "batata"
+      ],
+      "cuts": 6,
+      "mix_directions": 8,
+      "cooking_good_seconds": 10
+    },
+    {
+      "name": "Panqueca do Sol",
+      "ingredients": [
+        "banana",
+        "farinha",
+        "ovo"
+      ],
+      "cuts": 8,
+      "mix_directions": 10,
+      "cooking_good_seconds": 13
+    },
+    {
+      "name": "Tortinha Berry",
+      "ingredients": [
+        "farinha",
+        "ovo",
+        "morango"
+      ],
+      "cuts": 10,
+      "mix_directions": 12,
+      "cooking_good_seconds": 16
+    }
+  ],
+  "steps": [
+    "colher",
+    "cortar",
+    "misturar",
+    "cozinhar",
+    "decorar"
+  ],
+  "art": "original procedural SDL art; no external assets"
+}

@@ -73,3 +73,5 @@ Magic Tiles ganhou uma [primeira versão nativa](games/magic-tiles) com dez mús
 - **Performance**: sprites em baixa resolução, áudio simples e carregamento leve. Medir desempenho real antes de prometer compatibilidade.
 - **Controles**: padronizar mapa SDL de D-pad, A/B, Start/Select e ombros L1/L2/R1/R2 conforme detecção do M17; cada jogo pode especializar as funções. Evitar exigir toque.
 - **Entrega por título**: mecânica funcional → teste no M17 → refinamento visual → menu próprio → capa no seletor. Não confundir protótipo HTML com binário Linux instalado.
+
+Minichef possui uma [primeira versão nativa](games/minichef), com três receitas desbloqueáveis, cinco etapas interativas, chef coelhinho, cozinha de fazendinha em 480×272, animações, estrelas e retomada do preparo. ARM compilado; validação no M17 pendente.
