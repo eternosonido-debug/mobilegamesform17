@@ -132,9 +132,7 @@ inline void render(SDL_Renderer *r, const Controller &app, int step, bool audio,
             name = abbr[key];
           }
         } else
-          name = p.length == 32 ? letters[value] : noteName(t, value);
-        if (p.length == 16 && name == "SOL")
-          name = "SO";
+          name = letters[value];
         if (p.length == 16 && name == "KIT")
           name = "+";
         c.centered(x + pad / 2, y + 7, name, on ? bg : dim, 2);

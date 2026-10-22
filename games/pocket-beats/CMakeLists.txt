@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
- project(PocketBeats VERSION 0.6.0 LANGUAGES CXX)
+ project(PocketBeats VERSION 0.6.1 LANGUAGES CXX)
  include(CTest)
 endif()
 set(CMAKE_CXX_STANDARD 11)

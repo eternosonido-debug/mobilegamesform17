@@ -1,6 +1,6 @@
-# Pocket Beats — 0.6
+# Pocket Beats — 0.6.1
 
-Groovebox original e gratuita, offline, em C++11/SDL2. A revisão 0.6 simplifica a interação: quatro pistas e todos os passos na mesma tela. **Compilada para ARM, ainda sem teste desta revisão no M17 físico.**
+Groovebox original e gratuita, offline, em C++11/SDL2. A revisão 0.6.1 simplifica a interação: quatro pistas e todos os passos na mesma tela. **Compilada para ARM, ainda sem teste desta revisão no M17 físico.**
 
 ## Escolha o espaço, toque a nota, ligue com A
 
@@ -29,7 +29,7 @@ O rodapé mostra os sete atalhos, o som selecionado e se o passo está ligado. N
 
 As quatro pistas são BATERIA, BAIXO, GUITARRA e SYNTH. O tamanho é global: **4, 8, 16 ou 32 passos** para todos os instrumentos. Os passos aparecem juntos nos 480×272 pixels; o cursor nunca troca ou rola a página. Separadores a cada quatro passos ajudam a leitura. Quatro passos correspondem a um tempo.
 
-Em 16 passos, SO abrevia SOL. Em 32, as notas usam A/C/D/E/F/G/B nas células compactas; o nome completo e a oitava aparecem no rodapé da seleção. Sons de bateria usam abreviações nas células e nome completo no rodapé. O tamanho menor preserva os passos escondidos para quando você aumentar novamente.
+Nas células melódicas, C=Dó, D=Ré, E=Mi, F=Fá, G=Sol, A=Lá e B=Si, em qualquer tamanho de padrão. A legenda dos botões e o nome completo com oitava permanecem no rodapé. Sons de bateria usam abreviações nas células e nome completo no rodapé. O tamanho menor preserva os passos escondidos para quando você aumentar novamente.
 
 ## Poucas funções no menu
 
