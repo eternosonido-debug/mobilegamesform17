@@ -16,8 +16,10 @@ enum Control {
   Y,
   Start,
   Back,
-  NoteDown,
-  NoteUp,
+  ToneDo,
+  ToneRe,
+  ToneMi,
+  ToneFa,
   None
 };
 inline Control keyboard(SDL_Keycode c) {
@@ -37,17 +39,14 @@ inline Control keyboard(SDL_Keycode c) {
     if (v && SDL_GetKeyFromName(v) == c)
       return Control(i);
   }
-  const char *extra[] = {"FMG_KEY_L2", "FMG_KEY_R2"};
-  for (int i = 0; i < 2; ++i) {
-    const char *v = std::getenv(extra[i]);
+  const char *shoulders[] = {"FMG_KEY_L1", "FMG_KEY_R1", "FMG_KEY_L2",
+                             "FMG_KEY_R2"};
+  for (int i = 0; i < 4; ++i) {
+    const char *v = std::getenv(shoulders[i]);
     if (v && SDL_GetKeyFromName(v) == c)
-      return i ? NoteUp : NoteDown;
+      return Control(ToneDo + i);
   }
   switch (c) {
-  case SDLK_q:
-    return NoteDown;
-  case SDLK_e:
-    return NoteUp;
   case SDLK_LEFT:
     return Left;
   case SDLK_RIGHT:
@@ -70,61 +69,68 @@ inline Control keyboard(SDL_Keycode c) {
   case SDLK_ESCAPE:
   case SDLK_RSHIFT:
     return Back;
+  case SDLK_q:
+    return ToneDo;
+  case SDLK_w:
+    return ToneRe;
+  case SDLK_e:
+    return ToneMi;
+  case SDLK_r:
+    return ToneFa;
   default:
     return None;
   }
 }
 struct Input {
-  struct Device {
-    SDL_Joystick *j;
-    SDL_GameController *c;
-  };
   struct Binding {
     int key = -1, button = -1;
     std::string guid = "-";
   };
-  Binding pitch[2], pending[2];
+  Binding pitch[4], pending[4];
+  struct Device {
+    SDL_Joystick *j;
+    SDL_GameController *c;
+  };
+  std::vector<Device> devices;
+  std::set<SDL_Keycode> held;
+  std::set<int> triggerHeld;
   int learning = 0;
   bool mappingChanged = false;
-  std::string mappingMessage;
   std::string guid(SDL_JoystickID id) {
-    auto *j = SDL_JoystickFromInstanceID(id);
     char text[33] = {};
+    auto *j = SDL_JoystickFromInstanceID(id);
     if (j)
       SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(j), text, sizeof(text));
     return text;
   }
   bool loadMapping(const std::string &path) {
     std::ifstream f(path);
-    Binding values[2];
-    std::string header;
-    if (!(f >> header) || header != "PBPITCH1")
+    std::string magic;
+    Binding temp[4];
+    if (!(f >> magic) || (magic != "PBNOTES2" && magic != "PBPITCH1"))
       return false;
-    for (auto &b : values)
-      if (!(f >> b.key >> b.button >> b.guid) || b.button < -1 ||
-          b.button > 255 || b.key < -1)
+    int first = magic == "PBPITCH1" ? 2 : 0;
+    for (int i = first; i < 4; ++i)
+      if (!(f >> temp[i].key >> temp[i].button >> temp[i].guid) ||
+          temp[i].button < -1 || temp[i].button > 255 || temp[i].key < -1)
         return false;
-    for (int i = 0; i < 2; ++i)
-      pitch[i] = values[i];
+    for (int i = 0; i < 4; ++i)
+      pitch[i] = temp[i];
     return true;
   }
   bool saveMapping(const std::string &path) {
     std::ofstream f(path + ".tmp");
-    f << "PBPITCH1\n";
+    f << "PBNOTES2\n";
     for (auto &b : pitch)
       f << b.key << ' ' << b.button << ' ' << b.guid << '\n';
     f.close();
     return bool(f) && std::rename((path + ".tmp").c_str(), path.c_str()) == 0;
   }
   void beginMapping() {
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 4; ++i)
       pending[i] = pitch[i];
     learning = 1;
-    mappingMessage.clear();
   }
-  std::vector<Device> devices;
-  std::set<SDL_Keycode> held;
-  std::set<int> triggerHeld;
   void open(int index) {
     auto id = SDL_JoystickGetDeviceInstanceID(index);
     for (auto &d : devices)
@@ -148,36 +154,36 @@ struct Input {
         SDL_JoystickClose(d.j);
   }
   Control event(const SDL_Event &e) {
+    if (e.type == SDL_JOYDEVICEADDED)
+      open(e.jdevice.which);
     if (learning) {
       if ((e.type == SDL_KEYDOWN && keyboard(e.key.keysym.sym) == B) ||
           (e.type == SDL_CONTROLLERBUTTONDOWN &&
            e.cbutton.button == SDL_CONTROLLER_BUTTON_B)) {
         learning = 0;
-        mappingMessage = "CANCELLED";
         return None;
       }
       Binding binding;
       bool got = false;
       if (e.type == SDL_KEYDOWN && !e.key.repeat) {
-        auto action = keyboard(e.key.keysym.sym);
-        if (action >= Left && action <= Back)
+        auto key = keyboard(e.key.keysym.sym);
+        if (key >= Left && key <= Back)
           return None;
         binding.key = e.key.keysym.sym;
         got = true;
       }
       if (e.type == SDL_JOYBUTTONDOWN) {
-        auto *controller = SDL_GameControllerFromInstanceID(e.jbutton.which);
+        auto *c = SDL_GameControllerFromInstanceID(e.jbutton.which);
         bool reserved = false, cancel = false;
-        if (controller) {
+        if (c) {
           SDL_GameControllerButton buttons[] = {
               SDL_CONTROLLER_BUTTON_A,     SDL_CONTROLLER_BUTTON_B,
               SDL_CONTROLLER_BUTTON_X,     SDL_CONTROLLER_BUTTON_Y,
               SDL_CONTROLLER_BUTTON_START, SDL_CONTROLLER_BUTTON_BACK};
           for (int i = 0; i < 6; ++i) {
-            auto bound =
-                SDL_GameControllerGetBindForButton(controller, buttons[i]);
-            if (bound.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON &&
-                bound.value.button == e.jbutton.button) {
+            auto b = SDL_GameControllerGetBindForButton(c, buttons[i]);
+            if (b.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON &&
+                b.value.button == e.jbutton.button) {
               reserved = true;
               cancel = i == 1;
             }
@@ -203,40 +209,36 @@ struct Input {
         got = true;
       }
       if (got) {
-        if (learning == 2 && binding.key == pending[0].key &&
-            binding.button == pending[0].button &&
-            binding.guid == pending[0].guid) {
-          mappingMessage = "USE A DIFFERENT BUTTON";
-          return None;
-        }
+        for (int i = 0; i < learning - 1; ++i)
+          if (binding.key == pending[i].key &&
+              binding.button == pending[i].button &&
+              binding.guid == pending[i].guid)
+            return None;
         pending[learning - 1] = binding;
-        ++learning;
-        if (learning == 3) {
-          for (int i = 0; i < 2; ++i)
+        if (++learning == 5) {
+          for (int i = 0; i < 4; ++i)
             pitch[i] = pending[i];
           learning = 0;
           mappingChanged = true;
-          mappingMessage = "L2 R2 MAPPED";
         }
       }
       return None;
     }
     if (e.type == SDL_KEYDOWN && !e.key.repeat)
-      for (int i = 0; i < 2; ++i)
-        if (pitch[i].key >= 0 && e.key.keysym.sym == pitch[i].key)
-          return i ? NoteUp : NoteDown;
-    if (e.type == SDL_JOYBUTTONDOWN)
-      for (int i = 0; i < 2; ++i) {
-        int configured =
-            fmg::inputSetting(i ? "FMG_BUTTON_R2" : "FMG_BUTTON_L2", -1);
+      for (int i = 0; i < 4; ++i)
+        if (pitch[i].key >= 0 && pitch[i].key == e.key.keysym.sym)
+          return Control(ToneDo + i);
+    if (e.type == SDL_JOYBUTTONDOWN) {
+      const char *vars[] = {"FMG_BUTTON_L1", "FMG_BUTTON_R1", "FMG_BUTTON_L2",
+                            "FMG_BUTTON_R2"};
+      for (int i = 0; i < 4; ++i) {
+        int configured = fmg::inputSetting(vars[i], -1);
         if ((pitch[i].button == e.jbutton.button &&
              pitch[i].guid == guid(e.jbutton.which)) ||
             (configured >= 0 && configured == e.jbutton.button))
-          return i ? NoteUp : NoteDown;
+          return Control(ToneDo + i);
       }
-
-    if (e.type == SDL_JOYDEVICEADDED)
-      open(e.jdevice.which);
+    }
     if (e.type == SDL_WINDOWEVENT &&
         e.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
       held.clear();
@@ -259,8 +261,8 @@ struct Input {
       if (e.caxis.value > 16000) {
         triggerHeld.insert(id);
         if (!was)
-          return e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT ? NoteUp
-                                                                  : NoteDown;
+          return e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT ? ToneFa
+                                                                  : ToneMi;
       } else if (e.caxis.value < 8000)
         triggerHeld.erase(id);
     }
@@ -278,6 +280,10 @@ struct Input {
         return Start;
       case SDL_CONTROLLER_BUTTON_BACK:
         return Back;
+      case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+        return ToneDo;
+      case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+        return ToneRe;
       default:
         return None;
       }

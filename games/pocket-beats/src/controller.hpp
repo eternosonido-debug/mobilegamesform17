@@ -5,13 +5,12 @@ namespace pocketbeats {
 struct Controller {
   Session state;
   bool quit = false, restart = false, dirty = false, settings = false,
-       tools = false, song = false;
+       requestMapping = false;
   bool previewRequested = false;
-  int previewNote = 0, tool = 0, songCursor = 0;
+  int previewNote = 0, lastNoteKey = -1;
+  unsigned variation = 0;
   std::string message;
   std::vector<Session> history;
-  std::array<std::array<int, 8>, tracks> clipboard{};
-  int copied = 0;
   void remember() {
     if (history.size() == 32)
       history.erase(history.begin());
@@ -22,54 +21,60 @@ struct Controller {
       message = "NADA PARA DESFAZER";
       return;
     }
-    bool playing = state.playing;
     auto scene = state.scene;
+    bool playing = state.playing;
     state = history.back();
     history.pop_back();
-    state.playing = playing;
     state.scene = scene;
+    state.playing = playing;
+    state.songMode = false;
     dirty = true;
     message = "DESFEITO";
   }
   void audition() {
-    if (!state.preview)
-      return;
-    previewNote = state.track == 0
-                      ? (1 << state.drumLane)
-                      : state.current().notes[state.track][state.cursor];
-    previewRequested = previewNote != 0;
+    previewNote = state.current().chosen[state.track][state.cursor];
+    previewRequested = true;
   }
-  void copy() {
-    int start = state.page() * 8;
-    copied = std::min(8, state.current().length - start);
-    for (int t = 0; t < tracks; ++t)
-      for (int i = 0; i < copied; ++i)
-        clipboard[t][i] = state.current().notes[t][start + i];
-    message = "TRECHO COPIADO";
-  }
-  void paste() {
-    if (!copied) {
-      message = "COPIE UM TRECHO ANTES";
-      return;
-    }
+  void vary() {
     remember();
-    int start = state.page() * 8;
-    for (int t = 0; t < tracks; ++t)
-      for (int i = 0; i < copied && start + i < state.current().length; ++i)
-        state.current().notes[t][start + i] = clipboard[t][i];
+    ++variation;
+    auto &p = state.current();
+    unsigned rng = 1957 + variation * 7919 + state.slot * 101;
+    auto random = [&]() {
+      rng = rng * 1664525u + 1013904223u;
+      return rng;
+    };
+    const int chords[] = {9, 12, 13, 14};
+    for (int i = 0; i < p.length; ++i) {
+      int k = i % 16;
+      int drum = k % 8 == 0 ? 1 : k % 8 == 4 ? 2 : 0;
+      if (k % 2 == 0)
+        drum |= 4;
+      if (k >= 14 && random() % 3 == 0)
+        drum = 1 << (3 + random() % 3);
+      p.notes[0][i] = drum;
+      int root = chords[(i / 4 + variation) % 4];
+      p.notes[1][i] =
+          k % 4 == 0 ? root : (k % 4 == 3 && random() % 3 == 0 ? root : 0);
+      p.notes[2][i] = k % 4 == 2 ? root : 0;
+      p.notes[3][i] = (k == 7 || k == 15) ? 9 + random() % 7 : 0;
+      for (int t = 0; t < tracks; ++t)
+        if (p.notes[t][i])
+          p.chosen[t][i] = p.notes[t][i];
+    }
     dirty = true;
-    message = "TRECHO COLADO";
+    message = "NOVO BEAT - PODE DESFAZER";
   }
   void action(Control c) {
     auto &s = state;
     restart = false;
     previewRequested = false;
-    if (c == Back) {
-      s.playing = false;
-      quit = true;
-      return;
-    }
+    requestMapping = false;
     if (s.scene == Scene::Menu) {
+      if (c == Back) {
+        quit = true;
+        return;
+      }
       if (c == Up)
         s.menu = (s.menu + 5) % 6;
       if (c == Down)
@@ -91,192 +96,132 @@ struct Controller {
       return;
     }
     if (s.scene == Scene::Tutorial) {
-      if (c == A || c == B)
+      if (c == A || c == B || c == Back)
         s.scene = Scene::Menu;
       return;
     }
     if (s.scene == Scene::Paused) {
-      if (c == B || c == Y) {
+      if (settings) {
+        if (c == A || c == B || c == Back) {
+          settings = false;
+          return;
+        }
+        if (c == Left || c == Right) {
+          remember();
+          s.adjust(c == Right ? 1 : -1);
+          dirty = true;
+        }
+        return;
+      }
+      if (c == B) {
+        s.scene = Scene::Playing;
+        return;
+      }
+      if (c == Back) {
         s.scene = Scene::Playing;
         return;
       }
       if (c == Up)
-        s.pause = (s.pause + 4) % 5;
+        s.pause = (s.pause + 7) % 8;
       if (c == Down)
-        s.pause = (s.pause + 1) % 5;
+        s.pause = (s.pause + 1) % 8;
       if (c == A) {
-        if (s.pause == 0)
-          s.scene = Scene::Playing;
-        else if (s.pause == 1 || s.pause == 2) {
-          remember();
-          if (s.pause == 1)
-            s.current() = preset(s.slot);
-          else
-            s.current().notes = {};
-          s.cursor = 0;
-          dirty = true;
-          restart = true;
-          s.scene = Scene::Playing;
-        } else if (s.pause == 3)
-          s.scene = Scene::Menu;
-        else
-          quit = true;
-      }
-      return;
-    }
-    if (c == Start) {
-      if (song && !s.songMode) {
-        s.songMode = true;
-        s.playing = true;
-      } else
-        s.playing = !s.playing;
-      restart = true;
-      return;
-    }
-    if (song) {
-      if (c == B) {
-        song = false;
-        return;
-      }
-      if (c == Left || c == Right)
-        songCursor = std::max(0, std::min(std::min(7, s.orderLength),
-                                          songCursor + (c == Right ? 1 : -1)));
-      if (c == A) {
-        remember();
-        if (songCursor == s.orderLength) {
-          s.order[s.orderLength++] = s.slot;
-        } else
-          s.order[songCursor] = (s.order[songCursor] + 1) % slots;
-        dirty = true;
-      }
-      if (c == Y && songCursor < s.orderLength && s.orderLength > 1) {
-        remember();
-        for (int i = songCursor; i < s.orderLength - 1; ++i)
-          s.order[i] = s.order[i + 1];
-        --s.orderLength;
-        songCursor = std::min(songCursor, s.orderLength - 1);
-        dirty = true;
-      }
-      if (c == Up || c == Down) {
-        remember();
-        s.songMode = !s.songMode;
-        dirty = true;
-        restart = true;
-      }
-      return;
-    }
-    if (settings) {
-      if (c == B || c == Y) {
-        settings = false;
-        tools = true;
-        return;
-      }
-      if (c == Up)
-        s.setting = (s.setting + 7) % 8;
-      if (c == Down)
-        s.setting = (s.setting + 1) % 8;
-      if (c == Left || c == Right) {
-        remember();
-        s.adjust(c == Right ? 1 : -1);
-        dirty = true;
-        if (s.setting == 5)
-          audition();
-      }
-      return;
-    }
-    if (tools) {
-      if (c == B || c == Y) {
-        tools = false;
-        return;
-      }
-      if (c == Left || c == Right)
-        tool = (tool + (c == Right ? 1 : 5)) % 6;
-      if (c == Up || c == Down)
-        tool = (tool + (c == Down ? 2 : 4)) % 6;
-      if (c == A) {
-        switch (tool) {
+        switch (s.pause) {
         case 0:
-          remember();
-          s.current().timbre[s.track] = (s.current().timbre[s.track] + 1) % 3;
-          dirty = true;
-          audition();
-          if (!previewRequested) {
-            previewNote = s.track == 0 ? (1 << s.drumLane) : 1;
-            previewRequested = true;
-          }
+          s.scene = Scene::Playing;
           break;
         case 1:
-          copy();
-          break;
         case 2:
-          paste();
-          tools = false;
+          s.setting = s.pause - 1;
+          settings = true;
           break;
         case 3:
-          undo();
-          tools = false;
+          s.setting = 6;
+          settings = true;
           break;
         case 4:
-          tools = false;
-          song = true;
-          songCursor = 0;
+          vary();
+          s.scene = Scene::Playing;
           break;
         case 5:
-          tools = false;
-          settings = true;
-          s.setting = 0;
+          undo();
+          s.scene = Scene::Playing;
+          break;
+        case 6:
+          requestMapping = true;
+          break;
+        case 7:
+          quit = true;
           break;
         }
       }
       return;
     }
-    if (c == Y) {
-      tools = true;
+    if (c == Back) {
+      s.playing = false;
+      s.scene = Scene::Paused;
+      s.pause = 0;
       return;
     }
-    if (c == NoteDown || c == NoteUp) {
-      if (s.track == 0) {
-        s.drumLane =
-            std::max(0, std::min(2, s.drumLane + (c == NoteUp ? 1 : -1)));
-        audition();
-        return;
+    if (c == Start) {
+      s.songMode = false;
+      s.playing = !s.playing;
+      restart = true;
+      return;
+    }
+    int key = -1;
+    switch (c) {
+    case ToneDo:
+      key = 0;
+      break;
+    case ToneRe:
+      key = 1;
+      break;
+    case ToneMi:
+      key = 2;
+      break;
+    case ToneFa:
+      key = 3;
+      break;
+    case X:
+      key = 4;
+      break;
+    case Y:
+      key = 5;
+      break;
+    case B:
+      key = 6;
+      break;
+    default:
+      break;
+    }
+    if (key >= 0) {
+      int value = s.track == 0 ? (1 << key) : 9 + key;
+      auto &p = s.current();
+      int &chosen = p.chosen[s.track][s.cursor];
+      if (chosen != value) {
+        remember();
+        chosen = value;
+        if (p.notes[s.track][s.cursor])
+          p.notes[s.track][s.cursor] = value;
+        dirty = true;
       }
-      int &note = s.current().notes[s.track][s.cursor];
-      if (!note) {
-        message = "A ADICIONA A NOTA";
-        return;
-      }
-      remember();
-      note = std::max(1, std::min(8, note + (c == NoteUp ? 1 : -1)));
-      dirty = true;
+      lastNoteKey = key;
       audition();
       return;
     }
     if (c == A) {
       remember();
-      int &note = s.current().notes[s.track][s.cursor];
-      if (s.track == 0) {
-        note ^= 1 << s.drumLane;
-        if (note & (1 << s.drumLane))
-          audition();
-      } else {
-        note = note ? 0 : 1;
-        if (note)
-          audition();
-      }
+      s.current().toggle(s.track, s.cursor);
       dirty = true;
-    } else if (c == B) {
-      s.playing = false;
-      s.scene = Scene::Paused;
-    } else if (c == Left || c == Right) {
-      s.move(c == Right ? 1 : -1, 0);
-      if (!s.playing)
+      if (s.current().notes[s.track][s.cursor])
         audition();
-    } else if (c == Up || c == Down) {
-      s.move(0, c == Down ? 1 : -1);
-      if (!s.playing)
-        audition();
+      return;
     }
+    if (c == Left || c == Right)
+      s.move(c == Right ? 1 : -1, 0);
+    if (c == Up || c == Down)
+      s.move(0, c == Down ? 1 : -1);
   }
 };
 } // namespace pocketbeats

@@ -15,7 +15,7 @@ struct Voice {
 struct Synth {
   static constexpr int rate = 22050;
   Pattern pattern;
-  std::array<Voice, 6> voices, previewVoices;
+  std::array<Voice, 10> voices, previewVoices;
   std::array<Pattern, slots> sequence;
   std::array<int, 8> order{{0, 1, 2, 1, 0, 0, 0, 0}};
   int orderLength = 4, orderIndex = 0, activeSlot = 0;
@@ -60,11 +60,11 @@ struct Synth {
     if (track < 0 || track >= tracks || !note)
       return;
     if (track == 0) {
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < 7; ++i)
         if (note & (1 << i))
           startVoice(previewVoices[i], i + 1, style, volume);
     } else
-      startVoice(previewVoices[track + 2], note, style, volume);
+      startVoice(previewVoices[track + 6], note, style, volume);
   }
   void trigger() {
     if (step + 1 >= pattern.length) {
@@ -78,14 +78,14 @@ struct Synth {
     ++step;
     if (pattern.audible(0)) {
       int mask = pattern.notes[0][step];
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < 7; ++i)
         if (mask & (1 << i))
           startVoice(voices[i], i + 1, pattern.timbre[0], pattern.volume[0]);
     }
     for (int t = 1; t < 4; ++t) {
       int n = pattern.notes[t][step];
       if (n && pattern.audible(t))
-        startVoice(voices[t + 2], n, pattern.timbre[t], pattern.volume[t]);
+        startVoice(voices[t + 6], n, pattern.timbre[t], pattern.volume[t]);
     }
   }
   double rawVoice(int t) {
@@ -101,13 +101,22 @@ struct Synth {
       noise ^= noise >> 17;
       noise ^= noise << 5;
       double n = (noise & 65535) / 32767.5 - 1;
-      if (v.note == 1 || v.note == 4)
+      if (v.note == 1)
         out += std::sin(2 * pi * (48 * a + 9 * (1 - std::exp(-28 * a)))) *
                std::exp(-14 * a);
-      if (v.note == 2 || v.note == 5)
+      if (v.note == 2)
         out += (n * .7 + std::sin(2 * pi * 180 * a) * .3) * std::exp(-22 * a);
-      if (v.note >= 3)
+      if (v.note == 3)
         out += n * .25 * std::exp(-80 * a);
+      if (v.note >= 4 && v.note <= 6) {
+        double f = v.note == 4 ? 85 : v.note == 5 ? 120 : 165;
+        out += std::sin(2 * pi * (f * a + 2 * (1 - std::exp(-20 * a)))) *
+               std::exp(-9 * a) * .8;
+      }
+      if (v.note == 7)
+        out += (n * .4 + .07 * std::sin(2 * pi * 3107 * a) +
+                .05 * std::sin(2 * pi * 4673 * a)) *
+               std::exp(-3 * a);
     } else if (t == 1)
       out = (std::sin(w) + .25 * std::sin(2 * w)) * std::exp(-5 * a) *
             std::min(1., a * 250);
@@ -124,13 +133,14 @@ struct Synth {
   static const std::vector<int16_t> &bank() {
     static const std::vector<int16_t> data = [] {
       const int duration = rate * 6 / 5;
-      std::vector<int16_t> samples(3 * 4 * 9 * duration, 0);
+      std::vector<int16_t> samples(3 * 4 * 16 * duration, 0);
       Synth generator;
       generator.pattern.volume.fill(100);
-      static const int scale[] = {0, 0, 3, 5, 7, 10, 12, 15, 19};
+      static const int scale[] = {0,  0, 3, 5, 7, 10, 12, 15,
+                                  19, 3, 5, 7, 8, 10, 12, 14};
       for (int style = 0; style < 3; ++style)
         for (int t = 0; t < 4; ++t)
-          for (int n = 1; n <= 8; ++n) {
+          for (int n = 1; n <= 15; ++n) {
             auto &v = generator.voices[t];
             v.age = 0;
             v.note = n;
@@ -153,7 +163,7 @@ struct Synth {
                 low += .14 * (sample - low);
                 sample = low * 1.15 * std::exp(-2 * age);
               }
-              samples[((style * 4 + t) * 9 + n) * duration + i] =
+              samples[((style * 4 + t) * 16 + n) * duration + i] =
                   int16_t(std::max(-1., std::min(1., sample)) * 24000);
             }
           }
@@ -172,19 +182,19 @@ struct Synth {
       if (playing)
         --samplesToStep;
       int sum = 0;
-      for (int channel = 0; channel < 6; ++channel) {
-        int t = channel < 3 ? 0 : channel - 2;
+      for (int channel = 0; channel < 10; ++channel) {
+        int t = channel < 7 ? 0 : channel - 6;
         auto &v = voices[channel];
         if (playing && v.note && v.position < duration) {
           if (pattern.audible(t))
-            sum += samples[((v.style * 4 + t) * 9 + v.note) * duration +
+            sum += samples[((v.style * 4 + t) * 16 + v.note) * duration +
                            v.position] *
                    pattern.volume[t] / 100;
           ++v.position;
         }
         auto &pv = previewVoices[channel];
         if (pv.note && pv.position < duration) {
-          sum += samples[((pv.style * 4 + t) * 9 + pv.note) * duration +
+          sum += samples[((pv.style * 4 + t) * 16 + pv.note) * duration +
                          pv.position] *
                  pv.volume / 100;
           ++pv.position;

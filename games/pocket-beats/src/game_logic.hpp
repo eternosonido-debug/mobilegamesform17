@@ -10,26 +10,37 @@ constexpr int tracks = 4, maxSteps = 32, slots = 3;
 static const char *const names[] = {"DRUMS", "BASS", "GUITAR", "SYNTH"};
 static const char *const presets[] = {"NIGHT DRIVE", "SUNNY POP",
                                       "BROKEN BEAT"};
-inline std::string noteName(int track, int note) {
-  if (note == 0)
+inline std::string drumName(int mask) {
+  static const char *names[] = {"BUMBO",     "CAIXA",     "CHIMBAL",
+                                "TOM GRAVE", "TOM MEDIO", "TOM AGUDO",
+                                "PRATO"};
+  if (!mask)
     return "OFF";
-  if (track == 0) {
-    static const char *drums[] = {"OFF", "BUM", "CX",  "B+C",
-                                  "CH",  "B+H", "C+H", "ALL"};
-    return drums[note];
-  }
-  static const char *notes[] = {"OFF", "LA", "DO", "RE", "MI",
-                                "SOL", "LA", "DO", "MI"};
-  return notes[note];
+  for (int i = 0; i < 7; ++i)
+    if (mask == (1 << i))
+      return names[i];
+  return "KIT";
+}
+inline std::string noteName(int track, int note) {
+  if (track == 0)
+    return drumName(note);
+  static const char *notes[] = {"OFF", "LA",  "DO", "RE", "MI", "SOL",
+                                "LA",  "DO",  "MI", "DO", "RE", "MI",
+                                "FA",  "SOL", "LA", "SI"};
+  return note >= 0 && note < 16 ? notes[note] : "OFF";
 }
 inline std::string fullNoteName(int track, int note) {
   if (!note || track == 0)
     return noteName(track, note);
   int octave = track == 1 ? 1 : track == 2 ? 3 : 4;
-  if (note >= 2)
+  if (note >= 9)
     ++octave;
-  if (note >= 7)
-    ++octave;
+  else {
+    if (note >= 2)
+      ++octave;
+    if (note >= 7)
+      ++octave;
+  }
   return noteName(track, note) + std::to_string(octave);
 }
 struct Pattern {
@@ -38,6 +49,11 @@ struct Pattern {
   std::array<int, tracks> volume{{80, 75, 65, 60}};
   std::array<bool, tracks> mute{{false, false, false, false}};
   int solo = -1;
+  std::array<std::array<int, maxSteps>, tracks> chosen{};
+  Pattern() {
+    for (int t = 0; t < tracks; ++t)
+      chosen[t].fill(t == 0 ? 1 : 9);
+  }
   std::array<int, tracks> timbre{{0, 0, 0, 0}};
   bool audible(int t) const {
     return t >= 0 && t < tracks && !mute[t] && (solo < 0 || solo == t);
@@ -45,14 +61,20 @@ struct Pattern {
   bool toggle(int t, int s) {
     if (t < 0 || t >= tracks || s < 0 || s >= length)
       return false;
-    notes[t][s] = notes[t][s] ? 0 : 1;
+    if (notes[t][s]) {
+      chosen[t][s] = notes[t][s];
+      notes[t][s] = 0;
+    } else
+      notes[t][s] = chosen[t][s];
     return true;
   }
   bool setNote(int t, int s, int n) {
     if (t < 0 || t >= tracks || s < 0 || s >= length || n < 0 ||
-        n > (t == 0 ? 7 : 8))
+        n > (t == 0 ? 127 : 15))
       return false;
     notes[t][s] = n;
+    if (n)
+      chosen[t][s] = n;
     return true;
   }
   bool resize(int n) {
@@ -90,6 +112,10 @@ inline Pattern preset(int id) {
   static const int migrate[] = {0, 1, 2, 4, 5, 6, 4, 4, 4};
   for (auto &n : p.notes[0])
     n = migrate[n];
+  for (int t = 0; t < tracks; ++t)
+    for (int i = 0; i < maxSteps; ++i)
+      if (p.notes[t][i])
+        p.chosen[t][i] = p.notes[t][i];
   return p;
 }
 enum class Scene { Menu, Tutorial, Playing, Paused };
@@ -106,15 +132,9 @@ struct Session {
   }
   Pattern &current() { return patterns[slot]; }
   const Pattern &current() const { return patterns[slot]; }
-  int page() const { return cursor / 8; }
+  int copyStart() const { return (cursor / 8) * 8; }
   void move(int dx, int dy) {
-    int row = track == 0 ? drumLane : track + 2;
-    row = (row + dy + 6) % 6;
-    if (row < 3) {
-      track = 0;
-      drumLane = row;
-    } else
-      track = row - 2;
+    track = (track + dy + tracks) % tracks;
     cursor = (cursor + dx + current().length) % current().length;
   }
   void chooseSlot(int n) {
@@ -159,7 +179,7 @@ struct Session {
     std::ofstream f(tmp);
     if (!f)
       return false;
-    f << "POCKETBEATS2\n" << slot << ' ' << track << ' ' << cursor << '\n';
+    f << "POCKETBEATS3\n" << slot << ' ' << track << ' ' << cursor << '\n';
     f << drumLane << ' ' << preview << ' ' << songMode << ' ' << orderLength;
     for (int n : order)
       f << ' ' << n;
@@ -175,6 +195,11 @@ struct Session {
           f << ' ' << n;
         f << '\n';
       }
+      for (const auto &row : p.chosen) {
+        for (int n : row)
+          f << n << ' ';
+        f << '\n';
+      }
     }
     f.close();
     if (!f) {
@@ -187,13 +212,16 @@ struct Session {
     std::ifstream f(path);
     Session candidate;
     std::string magic;
-    if (!(f >> magic) || (magic != "POCKETBEATS1" && magic != "POCKETBEATS2") ||
+    if (!(f >> magic) ||
+        (magic != "POCKETBEATS1" && magic != "POCKETBEATS2" &&
+         magic != "POCKETBEATS3") ||
         !(f >> candidate.slot >> candidate.track >> candidate.cursor))
       return false;
     if (candidate.slot < 0 || candidate.slot >= slots || candidate.track < 0 ||
         candidate.track >= tracks)
       return false;
-    bool modern = magic == "POCKETBEATS2";
+    bool modern = magic != "POCKETBEATS1";
+    bool direct = magic == "POCKETBEATS3";
     if (modern) {
       int prev, song;
       if (!(f >> candidate.drumLane >> prev >> song >> candidate.orderLength) ||
@@ -223,9 +251,15 @@ struct Session {
           return false;
         p.mute[t] = mute;
         for (int &n : p.notes[t])
-          if (!(f >> n) || n < 0 || n > (modern && t == 0 ? 7 : 8))
+          if (!(f >> n) || n < 0 ||
+              n > (direct ? (t == 0 ? 127 : 15) : (modern && t == 0 ? 7 : 8)))
             return false;
       }
+      if (direct)
+        for (int t = 0; t < tracks; ++t)
+          for (int &n : p.chosen[t])
+            if (!(f >> n) || n < 1 || n > (t == 0 ? 127 : 15))
+              return false;
     }
     if (!modern) {
       static const int migrate[] = {0, 1, 2, 4, 5, 6, 4, 4, 4};
@@ -233,6 +267,12 @@ struct Session {
         for (int &n : p.notes[0])
           n = migrate[n];
     }
+    if (!direct)
+      for (auto &p : candidate.patterns)
+        for (int t = 0; t < tracks; ++t)
+          for (int i = 0; i < maxSteps; ++i)
+            if (p.notes[t][i])
+              p.chosen[t][i] = p.notes[t][i];
     if (candidate.cursor < 0 || candidate.cursor >= candidate.current().length)
       return false;
     *this = candidate;

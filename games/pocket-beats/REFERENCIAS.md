@@ -13,7 +13,7 @@ Pesquisa de 20/10/2026. Nenhum código externo foi incorporado ao Pocket Beats e
 
 Para o som, avaliar TinySoundFont com um banco pequeno de licença de redistribuição clara e limite de vozes, comparando custo e som com nosso banco pré-calculado. Para a experiência de uso, estudar Picoloop e o LittleGPTracker original e adaptar seleção, navegação e nomes de notas ao Pocket Beats. Não portar uma estação de trabalho desktop completa nesta etapa.
 
-No Pocket Beats atual, os números 1–8 dentro das células melódicas são índices de notas de uma escala pentatônica; não são volume, duração ou pontuação. A indicação precisa ser mais clara para o usuário.
+Na revisão inicial do Pocket Beats, os números 1–8 dentro das células melódicas são índices de notas de uma escala pentatônica; não são volume, duração ou pontuação. A revisão 0.6 já usa nomes, atribuição direta de sete notas e A para ativar/desativar.
 
 ## Revisões inspecionadas
 

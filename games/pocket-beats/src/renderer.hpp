@@ -3,192 +3,172 @@
 #include "pixel.hpp"
 namespace pocketbeats {
 inline void render(SDL_Renderer *r, const Controller &app, int step, bool audio,
-                   int learning = 0, int playingSlot = 0, int orderIndex = 0) {
+                   int learning = 0, int playingSlot = 0, int = 0) {
   using namespace ui;
   Canvas c(r);
+  int w, h;
+  SDL_RenderGetLogicalSize(r, &w, &h);
+  if (w != 480 || h != 272)
+    SDL_RenderSetLogicalSize(r, 480, 272);
   Paint bg(17, 23, 39), panel(30, 40, 60), white(231, 238, 245),
       dim(131, 149, 172), accent(101, 236, 199);
   Paint colors[] = {Paint(247, 139, 108), Paint(113, 192, 248),
                     Paint(242, 201, 94), Paint(192, 143, 244)};
   const auto &s = app.state;
   const auto &p = s.current();
-  c.rect(0, 0, 240, 136, bg);
-  c.text(7, 5, "POCKET BEATS", accent);
-  c.text(112, 5,
-         std::to_string(s.playing && s.songMode ? s.patterns[playingSlot].bpm
-                                                : p.bpm) +
-             " BPM",
-         white);
-  c.text(174, 5, s.playing ? (s.songMode ? "MUSICA" : "TOCANDO") : "PARADO",
-         s.playing ? accent : dim);
+  c.rect(0, 0, 480, 272, bg);
+  c.text(12, 8, "POCKET BEATS", accent, 2);
+  c.text(242, 8, std::to_string(p.bpm) + " BPM", white, 2);
+  c.text(372, 8, s.playing ? "TOCANDO" : "PARADO", s.playing ? accent : dim, 2);
   if (learning) {
-    c.centered(120, 37, "CONFIGURAR GATILHOS", accent);
-    c.centered(120, 64,
-               learning == 1 ? "APERTE L2 PARA DESCER" : "APERTE R2 PARA SUBIR",
-               white);
-    c.centered(120, 90, "B CANCELA", dim);
+    const char *buttons[] = {"L1", "R1", "L2", "R2"};
+    c.centered(240, 65, "CONFIGURAR BOTOES", accent, 2);
+    c.centered(240, 110, std::string("APERTE ") + buttons[learning - 1], white,
+               3);
+    c.centered(240, 158, std::to_string(learning) + " DE 4", dim, 2);
+    c.centered(240, 225, "B CANCELA", dim, 2);
     return;
   }
   if (s.scene == Scene::Menu) {
-    c.centered(120, 27, "ESCOLHA UM BEAT E TOQUE", white);
-    const char *items[] = {"CONTINUAR EDITANDO", "NIGHT DRIVE",
-                           "SUNNY POP",          "BROKEN BEAT",
-                           "COMO TOCAR",         "SALVAR E SAIR"};
+    c.centered(240, 55, "ESCOLHA UM BEAT E TOQUE", white, 2);
+    const char *items[] = {"CONTINUAR",   "NIGHT DRIVE", "SUNNY POP",
+                           "BROKEN BEAT", "COMO TOCAR",  "SALVAR E SAIR"};
     for (int i = 0; i < 6; ++i) {
       if (s.menu == i)
-        c.round(25, 39 + i * 13, 190, 12, 2, panel);
-      c.centered(120, 42 + i * 13, items[i], s.menu == i ? accent : dim);
+        c.round(45, 80 + i * 26, 390, 24, 4, panel);
+      c.centered(240, 84 + i * 26, items[i], s.menu == i ? accent : dim, 2);
     }
-    c.centered(120, 124, "A ESCOLHE", dim);
+    c.centered(240, 250, "A ESCOLHE", dim, 2);
     return;
   }
   if (s.scene == Scene::Tutorial) {
-    const char *lines[] = {"A MARCA E JA TOCA O SOM",
-                           "DIRECIONAIS ESCOLHEM O PAD",
-                           "L2 R2 DESCEM SOBEM A NOTA",
-                           "BUMBO CAIXA CHIMBAL SEPARADOS",
+    const char *lines[] = {"DIRECIONAIS ESCOLHEM O ESPACO",
+                           "L1 DO  R1 RE  L2 MI  R2 FA",
+                           "X SOL  Y LA  B SI",
+                           "A LIGA OU DESLIGA O ESPACO",
+                           "ESCOLHER A NOTA JA TOCA O SOM",
+                           "NA BATERIA CADA BOTAO E UM SOM",
                            "START TOCA OU PARA O BEAT",
-                           "Y MOSTRA AS ACOES",
-                           "B VOLTA  SELECT SALVA E SAI",
-                           "MESMO TAMANHO NAS 4 PISTAS",
+                           "SELECT ABRE O MENU",
                            "A OU B VOLTAM"};
     for (int i = 0; i < 9; ++i)
-      c.centered(120, 22 + i * 12, lines[i], i == 8 ? accent : white);
+      c.centered(240, 58 + i * 20, lines[i], i == 8 ? accent : white, 2);
     return;
   }
   if (s.scene == Scene::Paused) {
-    const char *items[] = {"CONTINUAR", "RESTAURAR BEAT INICIAL",
-                           "LIMPAR ESTE PADRAO", "MENU INICIAL",
-                           "SALVAR E SAIR"};
-    c.centered(120, 24, "PAUSADO", accent);
-    for (int i = 0; i < 5; ++i) {
+    if (app.settings) {
+      c.centered(240, 62,
+                 s.setting == 0   ? "TEMPO"
+                 : s.setting == 1 ? "TAMANHO DO BEAT"
+                                  : "ESCOLHER BEAT",
+                 accent, 2);
+      std::string value = s.setting == 0 ? std::to_string(p.bpm) + " BPM"
+                          : s.setting == 1
+                              ? std::to_string(p.length) + " PASSOS"
+                              : std::string(presets[s.slot]);
+      c.centered(240, 112, value, white, s.setting == 6 ? 3 : 4);
+      c.centered(240, 210, "ESQ DIR MUDA  A CONFIRMA", dim, 2);
+      c.centered(240, 240, "B VOLTA", dim, 2);
+      return;
+    }
+    const char *items[] = {"CONTINUAR",      "TEMPO",         "TAMANHO",
+                           "TROCAR BEAT",    "VARIAR O BEAT", "DESFAZER",
+                           "CONFIGURAR L/R", "SALVAR E SAIR"};
+    for (int i = 0; i < 8; ++i) {
       if (s.pause == i)
-        c.round(24, 40 + i * 16, 192, 14, 3, panel);
-      c.centered(120, 44 + i * 16, items[i], s.pause == i ? accent : dim);
+        c.round(42, 51 + i * 23, 396, 22, 4, panel);
+      c.centered(240, 55 + i * 23, items[i], s.pause == i ? accent : dim, 2);
     }
+    c.centered(240, 244,
+               app.message.empty() ? "A ESCOLHE  B VOLTA" : app.message, accent,
+               2);
     return;
   }
-  if (app.song) {
-    c.centered(120, 22, s.songMode ? "MODO MUSICA" : "MODO PADRAO", accent);
-    for (int i = 0; i < 8; ++i) {
-      int x = 10 + (i % 4) * 57, y = 40 + (i / 4) * 30;
-      bool selected = i == app.songCursor;
-      if (selected)
-        c.round(x - 2, y - 2, 55, 27, 3, white);
-      c.round(x, y, 51, 23, 2,
-              s.playing && s.songMode && orderIndex == i ? accent : panel);
-      std::string text = i < s.orderLength
-                             ? "BEAT " + std::to_string(s.order[i] + 1)
-                         : i == s.orderLength ? "+"
-                                              : "";
-      c.centered(x + 25, y + 8, text,
-                 s.playing && s.songMode && orderIndex == i ? bg : white);
-    }
-    c.centered(120, 104, "A TROCA  Y REMOVE  B VOLTA", white);
-    c.centered(120, 116, "START TOCA  CIMA MUDA MODO", dim);
-    c.centered(120, 128, app.message, accent);
-    return;
-  }
-  if (app.tools) {
-    c.centered(120, 22,
-               std::string("ACOES - ") + (s.track == 0   ? "BATERIA"
-                                          : s.track == 1 ? "BAIXO"
-                                          : s.track == 2 ? "GUITARRA"
-                                                         : "SYNTH"),
-               accent);
-    const char *labels[] = {"TIMBRE",   "COPIAR", "COLAR",
-                            "DESFAZER", "MUSICA", "AJUSTES"};
-    const char *styles[] = {"CLASSICO", "BRILHO", "SUAVE"};
-    std::string values[] = {styles[p.timbre[s.track]],
-                            "ESTES 8 PASSOS",
-                            app.copied ? "NO TRECHO ATUAL" : "COPIE PRIMEIRO",
-                            app.history.empty() ? "NADA AINDA" : "ULTIMA ACAO",
-                            "JUNTAR BEATS",
-                            "TEMPO E VOLUME"};
-    for (int i = 0; i < 6; ++i) {
-      int x = 9 + (i % 2) * 114, y = 35 + (i / 2) * 28;
-      if (app.tool == i)
-        c.round(x - 2, y - 2, 112, 27, 3, white);
-      c.round(x, y, 108, 23, 2, panel);
-      c.centered(x + 54, y + 3, labels[i], app.tool == i ? accent : white);
-      c.centered(x + 54, y + 14, values[i], dim);
-    }
-    c.centered(120, 123, app.message.empty() ? "A USA   B VOLTA" : app.message,
-               accent);
-    return;
-  }
-  if (app.settings) {
-    c.centered(120, 21, "AJUSTES", accent);
-    std::string rows[] = {
-        "TEMPO       " +
-            std::to_string(s.playing && s.songMode ? s.patterns[playingSlot].bpm
-                                                   : p.bpm) +
-            " BPM",
-        "TAMANHO     " + std::to_string(p.length) + " PASSOS",
-        "VOLUME      " + std::to_string(p.volume[s.track]),
-        std::string("SILENCIAR   ") + (p.mute[s.track] ? "SIM" : "NAO"),
-        std::string("SO ESTA PISTA ") + (p.solo == s.track ? "SIM" : "NAO"),
-        "NOTA        " + fullNoteName(s.track, p.notes[s.track][s.cursor]),
-        "PADRAO      " + std::to_string(s.slot + 1),
-        "MAPEAR L2 R2  A INICIA"};
-    for (int i = 0; i < 8; ++i) {
-      if (s.setting == i)
-        c.round(14, 32 + i * 11, 212, 11, 2, panel);
-      c.text(22, 34 + i * 11, rows[i], s.setting == i ? accent : dim);
-    }
-    c.centered(120, 124, "ESQ DIR MUDA  B VOLTA", white);
-    return;
-  }
-  c.text(7, 19, std::string(presets[s.slot]) + " " + std::to_string(s.slot + 1),
-         dim);
-  c.text(160, 19,
-         std::to_string(s.page() + 1) + "/" +
-             std::to_string((p.length + 7) / 8) + " PAG",
-         dim);
+  c.text(12, 34,
+         std::string(presets[s.slot]) + " " + std::to_string(s.slot + 1), dim,
+         2);
+  c.text(360, 34, std::to_string(p.length) + " PASSOS", dim, 2);
+  c.centered(280, 54, "START TOCA/PARA    SELECT MENU", dim);
+  const int left = 94, pitch = 384 / p.length, pad = pitch - 2;
   bool showPlayhead = s.playing && (!s.songMode || s.slot == playingSlot);
-  for (int j = 0; j < 8; ++j) {
-    int n = s.page() * 8 + j;
-    if (n >= p.length)
-      break;
-    int x = 61 + j * 22;
-    c.centered(x + 9, 31, std::to_string(n + 1),
-               showPlayhead && n == step ? accent : dim);
+  for (int n = 0; n < p.length; ++n) {
+    int x = left + n * pitch;
+    if (n % 4 == 0)
+      c.line(x - 2, 66, x - 2, 211, Paint(58, 72, 94));
+    if (p.length < 32 || n % 4 == 0 || n == p.length - 1)
+      c.centered(x + pad / 2, 66, std::to_string(n + 1),
+                 showPlayhead && n == step ? accent : dim);
+    if (showPlayhead && n == step)
+      c.rect(x, 77, pad, 3, accent);
   }
-  const char *labels[] = {"BUMBO", "CAIXA", "CHIMBAL",
-                          "BAIXO", "GUIT.", "SYNTH"};
-  for (int row = 0; row < 6; ++row) {
-    int t = row < 3 ? 0 : row - 2;
-    int y = 43 + row * 11;
-    bool selectedRow = t == s.track && (t != 0 || row == s.drumLane);
-    c.text(3, y + 2, labels[row], selectedRow ? colors[t] : dim);
-    for (int j = 0; j < 8; ++j) {
-      int n = s.page() * 8 + j;
-      if (n >= p.length)
-        break;
-      int x = 61 + j * 22;
-      bool on = t == 0 ? bool(p.notes[0][n] & (1 << row)) : p.notes[t][n] != 0;
-      bool selected = selectedRow && n == s.cursor;
+  const char *labels[] = {"BATERIA", "BAIXO", "GUIT.", "SYNTH"};
+  const char *letters[] = {"",  "A", "C", "D", "E", "G", "A", "C",
+                           "E", "C", "D", "E", "F", "G", "A", "B"};
+  const char *drumLetters[] = {"B", "C", "H", "T", "T", "T", "P"};
+  for (int t = 0; t < 4; ++t) {
+    int y = 84 + t * 32;
+    c.text(5, y + 8, labels[t], t == s.track ? colors[t] : dim, 2);
+    for (int n = 0; n < p.length; ++n) {
+      int x = left + n * pitch;
+      bool on = p.notes[t][n] != 0;
+      bool selected = t == s.track && n == s.cursor;
+      int value = on ? p.notes[t][n] : p.chosen[t][n];
       if (selected)
-        c.round(x - 2, y - 1, 22, 12, 2, white);
-      c.round(x, y, 18, 10, 2, on ? colors[t] : panel);
-      if (on) {
+        c.round(x - 1, y - 1, pad + 2, 31, 3, white);
+      c.round(x, y, pad, 29, 3, on ? colors[t] : panel);
+      if (on || selected) {
+        std::string name;
         if (t == 0) {
-          c.disc(x + 9, y + 5, 2, bg);
+          int key = -1;
+          for (int i = 0; i < 7; ++i)
+            if (value == (1 << i))
+              key = i;
+          if (p.length == 32)
+            name = key >= 0 ? drumLetters[key] : "+";
+          else if (key < 0)
+            name = "KIT";
+          else {
+            const char *abbr[] = {"BU", "CX", "CH", "TG", "TM", "TA", "PR"};
+            name = abbr[key];
+          }
         } else
-          c.centered(x + 9, y + 2, noteName(t, p.notes[t][n]), bg);
+          name = p.length == 32 ? letters[value] : noteName(t, value);
+        if (p.length == 16 && name == "SOL")
+          name = "SO";
+        if (p.length == 16 && name == "KIT")
+          name = "+";
+        c.centered(x + pad / 2, y + 7, name, on ? bg : dim, 2);
       }
       if (showPlayhead && n == step)
-        c.rect(x, y + 9, 18, 1, accent);
+        c.rect(x, y + 27, pad, 2, accent);
     }
   }
-  std::string selected =
-      s.track == 0 ? labels[s.drumLane]
-                   : fullNoteName(s.track, p.notes[s.track][s.cursor]);
-  c.text(5, 114, "L2 - " + selected + " + R2", accent);
-  c.text(5, 127,
-         app.message.empty() ? (audio ? "A MARCA  Y ACOES  START TOCA"
-                                      : "SEM DISPOSITIVO DE AUDIO")
-                             : app.message,
-         dim);
+  int value = p.chosen[s.track][s.cursor];
+  bool enabled = p.notes[s.track][s.cursor] != 0;
+  c.text(8, 217,
+         "PASSO " + std::to_string(s.cursor + 1) + "  " +
+             fullNoteName(s.track, value) +
+             (enabled ? "  LIGADO" : "  DESLIGADO"),
+         accent, 2);
+  if (!app.message.empty()) {
+    c.centered(240, 237, app.message, white, 2);
+  } else if (!audio)
+    c.centered(240, 237, "SEM AUDIO", white, 2);
+  else {
+    const char *keys[] = {"L1", "R1", "L2", "R2", "X", "Y", "B"};
+    const char *mel[] = {"DO", "RE", "MI", "FA", "SOL", "LA", "SI"};
+    const char *drums[] = {"BUM", "CX", "CH", "T.G", "T.M", "T.A", "PRATO"};
+    int selected = -1;
+    for (int i = 0; i < 7; ++i)
+      if (value == (s.track == 0 ? 1 << i : 9 + i))
+        selected = i;
+    for (int i = 0; i < 7; ++i) {
+      int x = 8 + (i % 4) * 118, y = i < 4 ? 239 : 258;
+      c.text(x, y,
+             std::string(keys[i]) + " " + (s.track == 0 ? drums[i] : mel[i]),
+             i == selected ? accent : dim, 2);
+    }
+  }
+  c.text(362, 258, enabled ? "A DESL" : "A LIGA", white, 2);
 }
 } // namespace pocketbeats

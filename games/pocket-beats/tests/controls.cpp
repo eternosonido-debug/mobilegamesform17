@@ -11,7 +11,7 @@ int main() {
   check(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_JOYSTICK |
                  SDL_INIT_GAMECONTROLLER) == 0,
         "SDL init");
-  int index = SDL_JoystickAttachVirtual(SDL_JOYSTICK_TYPE_UNKNOWN, 4, 8, 0);
+  int index = SDL_JoystickAttachVirtual(SDL_JOYSTICK_TYPE_UNKNOWN, 4, 12, 0);
   check(index >= 0, "virtual joystick");
   auto *j = SDL_JoystickOpen(index);
   {
@@ -25,89 +25,78 @@ int main() {
     for (int axis : {0, 2}) {
       SDL_JoystickSetVirtualAxis(j, axis, 30000);
       SDL_JoystickUpdate();
-      auto d = input.direction();
-      check(d.x == 1, "both sticks");
+      check(input.direction().x == 1, "both sticks");
       app.action(Right);
       SDL_JoystickSetVirtualAxis(j, axis, 0);
       SDL_JoystickUpdate();
     }
-    check(app.state.cursor == 2, "sticks navigation");
-    int n = app.state.current().notes[0][2];
-    app.action(A);
-    check(app.state.current().notes[0][2] == (n ^ 1), "A toggle");
-    // Actual SDL events for pitch edits, learned digital triggers and rollback.
+    check(app.state.cursor == 2, "navigate");
     app.state.track = 1;
-    app.state.current().setNote(1, 2, 2);
-    e.key.keysym.sym = SDLK_e;
-    app.action(input.event(e));
-    check(app.state.current().notes[1][2] == 3 && app.previewRequested,
-          "R2 previews changed note");
-    e.key.keysym.sym = SDLK_q;
-    app.action(input.event(e));
-    check(app.state.current().notes[1][2] == 2, "L2 keyboard note down");
-    app.state.current().setNote(1, 2, 0);
-    app.action(NoteDown);
-    check(app.state.current().notes[1][2] == 0, "empty step remains off");
-    app.state.current().setNote(1, 2, 1);
-    app.action(NoteDown);
-    check(app.state.current().notes[1][2] == 1, "lowest note remains on");
+    app.state.current().notes[1][2] = 0;
+    SDL_Keycode keys[] = {SDLK_q, SDLK_w, SDLK_e, SDLK_r,
+                          SDLK_c, SDLK_v, SDLK_x};
+    for (int i = 0; i < 7; ++i) {
+      e = {};
+      e.type = SDL_KEYDOWN;
+      e.key.keysym.sym = keys[i];
+      app.action(input.event(e));
+      check(app.state.current().notes[1][2] == 0 &&
+                app.state.current().chosen[1][2] == 9 + i &&
+                app.previewRequested,
+            "note key activates step or wrong note");
+    }
+    app.action(A);
+    check(app.state.current().notes[1][2] == 15, "A enables chosen SI");
+    app.action(ToneDo);
+    check(app.state.current().notes[1][2] == 9, "active note replaced");
+    app.action(A);
+    app.action(A);
+    check(app.state.current().notes[1][2] == 9, "A preserves note");
     input.beginMapping();
-    e = {};
-    e.type = SDL_JOYBUTTONDOWN;
-    e.jbutton.which = SDL_JoystickInstanceID(j);
-    e.jbutton.button = 4;
-    input.event(e);
-    check(input.learning == 2, "learn L2");
-    input.event(e);
-    check(input.learning == 2, "duplicate trigger rejected");
-    e.jbutton.button = 5;
-    input.event(e);
-    check(!input.learning && input.mappingChanged, "learn R2");
-    check(input.event(e) == NoteUp, "learned R2 event");
-    std::string map = "/tmp/pocket-beats-controls-" + std::to_string(getpid());
-    check(input.saveMapping(map), "save trigger mapping");
-    Input loaded;
-    check(loaded.loadMapping(map) && loaded.event(e) == NoteUp,
-          "reload trigger mapping");
-    std::remove(map.c_str());
+    int buttons[] = {4, 5, 8, 9};
+    for (int i = 0; i < 4; ++i) {
+      e = {};
+      e.type = SDL_JOYBUTTONDOWN;
+      e.jbutton.which = SDL_JoystickInstanceID(j);
+      e.jbutton.button = buttons[i];
+      input.event(e);
+      if (i < 3)
+        check(input.learning == i + 2, "mapping sequence");
+    }
+    check(!input.learning && input.mappingChanged, "mapping complete");
+    check(input.event(e) == ToneFa, "R2 maps FA");
+    std::string path = "/tmp/pocket-map-" + std::to_string(getpid());
+    check(input.saveMapping(path), "save mapping");
+    Input other;
+    check(other.loadMapping(path) && other.event(e) == ToneFa, "load mapping");
+    std::remove(path.c_str());
     input.beginMapping();
-    e.jbutton.button = 5;
-    input.event(e);
     e = {};
     e.type = SDL_KEYDOWN;
     e.key.keysym.sym = SDLK_x;
     input.event(e);
-    check(!input.learning && input.pitch[0].button == 4,
-          "cancel mapping preserves old pair");
-    check(noteName(1, 1) == "LA" && fullNoteName(1, 2) == "DO2" &&
-              fullNoteName(2, 1) == "LA3",
-          "note names");
+    check(!input.learning && input.pitch[3].button == 9,
+          "cancel preserves mapping");
     app.action(Start);
-    check(app.state.playing, "transport");
-    app.action(Y);
-    check(app.tools, "Y opens six action cards");
-    app.tool = 5;
-    app.action(A);
-    app.action(Right);
-    check(app.state.current().bpm == 105, "Y tempo");
-    app.action(Down);
-    app.action(Right);
-    check(app.state.current().length == 32, "global loop");
+    check(app.state.playing, "play");
     app.action(B);
-    check(!app.settings && app.state.playing,
-          "B closes settings while playing");
-    app.action(B);
-    check(!app.tools && app.state.playing, "B closes action cards");
-    app.action(B);
-    check(!app.state.playing && app.state.scene == Scene::Paused, "B pause");
-    app.action(A);
-    check(app.state.scene == Scene::Playing, "resume");
+    check(app.state.playing && app.state.current().notes[1][2] == 15,
+          "B is SI while playing");
     app.action(Back);
-    check(app.quit && !app.state.playing, "save exit");
+    check(!app.state.playing && app.state.scene == Scene::Paused,
+          "Select menu");
+    app.state.pause = 1;
+    app.action(A);
+    app.action(Right);
+    check(app.state.current().bpm == 105, "tempo");
+    app.action(A);
+    app.state.pause = 7;
+    app.action(A);
+    check(app.quit, "save exit");
   }
   SDL_JoystickClose(j);
   SDL_JoystickDetachVirtual(index);
   SDL_Quit();
-  std::cout << "PASS SDL A, both virtual sticks, transport, global settings, B "
-               "pause and exit\n";
+  std::cout << "PASS seven direct note keys, A-only activation, both sticks, "
+               "four shoulder mappings and simple menu\n";
 }

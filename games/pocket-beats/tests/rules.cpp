@@ -13,7 +13,7 @@ int main() {
   check(!p.toggle(-1, 0) && !p.toggle(0, 32) && !p.resize(12),
         "invalid action");
   check(p.notes == before && p.length == 16, "invalid action mutated state");
-  check(p.toggle(2, 3) && p.notes[2][3] == 1, "valid pad");
+  check(p.toggle(2, 3) && p.notes[2][3] == 9, "valid pad");
   p.setNote(2, 31, 8); // outside active pattern is invalid
   for (int len : {4, 8, 16, 32}) {
     check(p.resize(len), "length");

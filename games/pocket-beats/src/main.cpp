@@ -59,6 +59,16 @@ int main(int argc, char **argv) {
       app.state.scene = Scene::Playing;
       app.state.playing = true;
     }
+    // Basic mode keeps every track audible: old hidden mute/solo/song controls
+    // must not silently disable instruments after the interface simplification.
+    app.state.songMode = false;
+    const int mix[] = {80, 75, 65, 60};
+    for (auto &p : app.state.patterns) {
+      p.mute.fill(false);
+      p.solo = -1;
+      for (int t = 0; t < tracks; ++t)
+        p.volume[t] = mix[t];
+    }
     Input input;
     const std::string mappingPath = folder + "/pocket-beats-controls.cfg";
     input.loadMapping(mappingPath);
@@ -72,6 +82,8 @@ int main(int argc, char **argv) {
     audio.syncSession(app.state);
     auto dispatch = [&](Control key) {
       app.action(key);
+      if (app.requestMapping)
+        input.beginMapping();
       audio.syncSession(app.state, app.restart);
       if (app.previewRequested)
         audio.audition(app.state.track, app.previewNote,
@@ -89,18 +101,6 @@ int main(int argc, char **argv) {
         if (e.type == SDL_QUIT) {
           app.quit = true;
           break;
-        }
-        if (app.settings && app.state.setting == 7 && !input.learning) {
-          // Consume A to enter learning; it must not become the L2 binding.
-          Control choice = input.event(e);
-          if (choice == A) {
-            input.beginMapping();
-            continue;
-          }
-          if (choice != None) {
-            dispatch(choice);
-          }
-          continue;
         }
         Control key = input.event(e);
         if (key != None) {
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
 
       if (!smoke && app.dirty && !app.state.playing && now - lastSave >= 1500) {
         bool ok = app.state.save(path);
-        app.message = ok ? "SAVED" : "SAVE FAILED";
+        app.message = ok ? "SALVO" : "ERRO AO SALVAR";
         if (ok)
           app.dirty = false;
         lastSave = now;
@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
       if (!app.message.empty() && now - messageAt > 1800)
         app.message.clear();
       if (input.mappingChanged) {
-        app.message = input.saveMapping(mappingPath) ? "L2 R2 SALVOS"
-                                                     : "ERRO AO SALVAR L2 R2";
+        app.message = input.saveMapping(mappingPath) ? "BOTOES SALVOS"
+                                                     : "ERRO AO SALVAR BOTOES";
         input.mappingChanged = false;
         lastSave = now;
       }

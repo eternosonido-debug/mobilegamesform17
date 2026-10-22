@@ -36,3 +36,11 @@ Sequência global ajustável de 4/8/16/32 passos, inicial 16; sem comprimento po
 ## Implementação de usabilidade — revisão 0.4
 
 A marcação e a alteração de nota têm prévia sonora. A bateria tem três linhas independentes sob a mesma pista. Y abre seis ações, com timbres próprios gratuitos, copiar/colar até oito passos, desfazer, sequência de padrões e ajustes separados. O tamanho continua global para os quatro instrumentos. Save novo migra o formato anterior; validação física pendente. Não acrescentar controles escondidos ou combinações complexas para funções essenciais.
+
+## Grade completa — revisão 0.5
+
+Por solicitação do usuário, eliminar a paginação. Todos os passos ativos (até 32) devem aparecer juntos em 480×272, mantendo seis linhas de edição e identificação completa da nota selecionada. Copiar/colar continuam operando sobre grupos explícitos de oito passos; isso não representa páginas da interface.
+
+## Controles diretos — revisão 0.6 (substitui a interação anterior)
+
+L1=Dó, R1=Ré, L2=Mi, R2=Fá, X=Sol, Y=Lá, B=Si. Na bateria, escolher bumbo/caixa/chimbal/três tons/prato. A exclusivamente liga/desliga, sem apagar a atribuição da nota. Quatro pistas inteiras em 480×272, sem paginação. Start toca/para e Select abre um menu mínimo. Variação musical com desfazer; remover da interface os painéis e funções avançadas anteriores. Save3 importa Save1/2; validação física pendente.

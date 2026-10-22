@@ -17,7 +17,7 @@ Makefile equivalente na pasta do jogo. Teste sem janela/áudio físicos:
 SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software SDL_AUDIODRIVER=dummy ./build/pocket-beats/pocket-beats --smoke --screenshot preview.bmp
 ```
 
-Canvas lógico 240×136, saída inicial 480×272, escala sem suavização. Áudio mono S16 a 22050 Hz, seis vozes de reprodução e vozes separadas para prévia; blocos de 1024 amostras (cerca de 46 ms, latência real dependente do backend). Callback próprio mistura o banco preparado antes de abrir o dispositivo, sem alocação, trigonometria por amostra, desenho ou acesso a disco. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
+Interface em 480×272, com todos os passos na mesma tela e fonte pixel sem suavização. Áudio mono S16 a 22050 Hz, sete vozes de bateria, três melódicas e vozes separadas para prévia; blocos de 1024 amostras (cerca de 46 ms, latência real dependente do backend). Callback próprio mistura o banco preparado antes de abrir o dispositivo, sem alocação, trigonometria por amostra, desenho ou acesso a disco. Regras, síntese, interface e input estão separados. Apenas o helper genérico de direcionais de shared/fmg-runtime é reutilizado; os outros jogos não são dependências.
 
 ## ARM do M17 anteriormente identificado
 
@@ -43,12 +43,14 @@ Somente no cartão/firmware que já usa `/sdcard/fmg-test` e `/sdcard/simulator/
 
 Select salva e encerra para o menu original. Save próprio: `fmg-test/saves/pocket-beats.sav`; log `fmg-test/pocket-beats-teste.log`. No computador usa SDL_GetPrefPath, ou a pasta definida por FMG_SAVE_DIR. Gravação temporária e renomeação protegem contra arquivos parciais durante a gravação normal; não há garantia contra falha física do cartão.
 
-## Validação da revisão 0.4
+## Validação da revisão 0.6
 
-Seis grupos específicos: regras/save; áudio de quatro instrumentos, três timbres, bateria independente, prévia e sequência; controles SDL com ambos os manches virtuais e L2/R2; reprodução com interface bloqueada; fluxo de edição e migração de saves; janela completa com marcação, cópia, colagem, play e saída.
+Sete grupos específicos: regras/save; áudio dos quatro instrumentos, sete sons de bateria, sete notas diretas e prévia; controles com sete atalhos, A exclusivo e dois manches virtuais; áudio com interface bloqueada; variações/desfazer e migração dos saves antigos; janela completa com escolha de percussão, A, play, menu e save; todos os passos visíveis em 4/8/16/32.
 
-Build local com AddressSanitizer/UndefinedBehaviorSanitizer; conjunto completo do repositório com 22 grupos. Screenshots da grade, ações e sequência foram renderizados e inspecionados. O banco de sons é próprio, com três variações por instrumento e aproximadamente 5,7 MB, preparado antes de abrir o dispositivo. Som e mixagem não dependem do ciclo de desenho.
+Build local com AddressSanitizer/UndefinedBehaviorSanitizer. O repositório completo tem 23 grupos de testes. Screenshots da grade foram renderizados e inspecionados. A revisão anterior tinha seis linhas de edição; agora há quatro pistas, e o botão de nota escolhe o som da bateria sem subpistas ou menus. Menu Select e captura L1/R1/L2/R2 precisam ser confirmados na unidade.
 
-Pendente no M17: qualidade auditiva, mapeamento físico A/B/X/Y, gatilhos e ambos os manches, fluidez/FPS, uso de CPU/memória, ausência de cortes de áudio e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo no console.
+O banco próprio ocupa aproximadamente 10,2 MB e é preparado antes de abrir o áudio. Há sete vozes independentes de percussão e três melódicas, além de vozes próprias de prévia. As notas diretas são Dó/Ré/Mi/Fá/Sol/Lá/Si; índices antigos de notas continuam sendo sintetizados para preservar os beats importados.
 
-O save atualizado POCKETBEATS2 aceita importação do POCKETBEATS1. Preserve uma cópia do save antes da primeira execução desta revisão: executáveis antigos não leem o formato novo. O arquivo adicional pocket-beats-controls.cfg guarda somente o aprendizado de L2/R2 deste jogo.
+Pendente no M17: som, conforto/legibilidade em 32 passos, mapeamento físico, FPS, uso real de memória/CPU, ausência de cortes e retorno ao Ports. Não foi medida latência real nem realizado teste auditivo desta revisão no aparelho.
+
+Save POCKETBEATS3 importa POCKETBEATS1/2 e preserva a escolha de nota de passos desligados. Preserve uma cópia do save antes da primeira execução; executáveis antigos não leem o formato novo. O arquivo pocket-beats-controls.cfg usa PBNOTES2 para quatro ombros e importa o PBPITCH1 anterior.

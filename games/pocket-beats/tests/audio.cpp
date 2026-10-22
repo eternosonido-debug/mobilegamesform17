@@ -124,6 +124,30 @@ int main() {
     check(chain.step == 0 && chain.activeSlot == expected,
           "song boundary order");
   }
+  // Every physical note button has a distinct, audible percussion voice.
+  std::array<long long, 7> kitHashes{};
+  for (int k = 0; k < 7; ++k) {
+    Synth kit;
+    kit.audition(0, 1 << k, 0, 80);
+    kit.render(x.data(), x.size());
+    long long energy = 0;
+    for (int i = 0; i < int(x.size()); ++i) {
+      energy += int(x[i]) * int(x[i]);
+      kitHashes[k] += x[i] * (i % 97);
+    }
+    check(energy > 100000, "silent drum tone");
+    for (int old = 0; old < k; ++old)
+      check(kitHashes[old] != kitHashes[k], "duplicate drum tone");
+  }
+  for (int n = 9; n <= 15; ++n) {
+    Synth melodic;
+    melodic.audition(1, n, 0, 80);
+    melodic.render(x.data(), x.size());
+    long long energy = 0;
+    for (auto v : x)
+      energy += int(v) * int(v);
+    check(energy > 100000, "silent direct musical note");
+  }
   std::cout << "PASS four distinct audible instruments, deterministic mix, "
                "volume/mute, all lengths timing and stop\n";
 }

@@ -1,23 +1,43 @@
 {
   "game": "Pocket Beats",
+  "version": "0.6",
+  "date": "2026-10-21",
   "native_build": true,
-  "standalone_tests_passed": 6,
-  "repository_tests_passed": 22,
+  "standalone_test_groups_passed": 7,
+  "repository_test_groups_passed": 23,
   "sanitizers": [
     "AddressSanitizer",
     "UndefinedBehaviorSanitizer"
   ],
-  "four_distinct_nonzero_instrument_outputs": true,
-  "presets": 3,
-  "global_step_lengths": [
+  "note_keys": {
+    "L1": "DO",
+    "R1": "RE",
+    "L2": "MI",
+    "R2": "FA",
+    "X": "SOL",
+    "Y": "LA",
+    "B": "SI"
+  },
+  "a_exclusively_activates_steps": true,
+  "inactive_note_memory_tested": true,
+  "seven_distinct_drum_sounds_tested": true,
+  "all_steps_visible_sizes": [
     4,
     8,
     16,
     32
   ],
   "virtual_sticks_tested": 2,
+  "four_shoulder_mapping_tested": true,
+  "variation_and_undo_tested": true,
+  "imports_save_versions": [
+    1,
+    2
+  ],
+  "writes_save_version": 3,
+  "full_window_flow_tested": true,
   "hardware_tested": false,
-  "sd_modified": false,
+  "sd_modified_this_revision": false,
   "arm": {
     "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
     "interpreter": [
@@ -35,22 +55,8 @@
       "libIMGegl.so",
       "libsrv_um.so"
     ],
-    "strong_imports_checked": 538,
+    "strong_imports_checked": 539,
     "failures": [],
     "note": "Static compatibility inspection; not runtime or hardware test"
-  },
-  "version": "0.4",
-  "ui_stall_audio_regression_passed": true,
-  "user_feedback_previous_version": "0.1 was tested by the user: awkward interface and possible stutters",
-  "sd_modified_this_revision": false,
-  "pitch_button_editing_tested": true,
-  "digital_trigger_learning_and_save_tested": true,
-  "physical_triggers_tested": false,
-  "independent_drum_voices_tested": true,
-  "audition_without_transport_tested": true,
-  "timbres_per_track": 3,
-  "undo_copy_paste_tested": true,
-  "song_sequence_tested": true,
-  "legacy_save_migration_tested": true,
-  "full_window_edit_copy_play_save_tested": true
+  }
 }

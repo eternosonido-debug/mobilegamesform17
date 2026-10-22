@@ -1,61 +1,58 @@
-# Pocket Beats — 0.4
+# Pocket Beats — 0.6
 
-Groovebox original offline para M17 Linux, em C++11/SDL2. A revisão 0.4 está implementada e compilada para ARM; **teste desta revisão no M17 físico pendente**. O usuário testou a 0.1 e relatou interface difícil e possíveis travadinhas; as correções posteriores não foram confirmadas por nós no hardware.
+Groovebox original e gratuita, offline, em C++11/SDL2. A revisão 0.6 simplifica a interação: quatro pistas e todos os passos na mesma tela. **Compilada para ARM, ainda sem teste desta revisão no M17 físico.**
 
-## Começar sem configurar
+## Escolha o espaço, toque a nota, ligue com A
 
-Escolha um dos três beats no menu e aperte A. Start toca/para. Use qualquer manche ou D-pad para escolher um quadradinho e A para marcar: o som toca imediatamente. Os beats prontos são Night Drive (104 BPM), Sunny Pop (120 BPM) e Broken Beat (96 BPM); as edições ficam em três espaços separados.
+Use D-pad ou qualquer manche para escolher o espaço na pista. Os sete botões abaixo escolhem a nota e deixam ouvir o som imediatamente. **Eles não ligam um espaço vazio. A é o único botão que liga/desliga o espaço**, preservando a nota escolhida quando você o desliga.
 
-São quatro pistas musicais: bateria, baixo, guitarra e sintetizador. A bateria aparece em três linhas — **bumbo, caixa, chimbal** — para combinar os sons com clareza, inclusive os três no mesmo passo. Cada som de bateria tem sua própria voz: o chimbal não interrompe o bumbo.
+| Botão | Baixo, guitarra e synth | Bateria |
+|---|---|---|
+| L1 | Dó | Bumbo |
+| R1 | Ré | Caixa |
+| L2 | Mi | Chimbal |
+| R2 | Fá | Tom grave |
+| X | Sol | Tom médio |
+| Y | Lá | Tom agudo |
+| B | Si | Prato |
 
-As quatro pistas compartilham o tamanho do padrão: **4, 8, 16 ou 32 passos**, inicial 16, com oito passos por página. Quatro passos correspondem a um tempo. Diminuir o padrão preserva os passos escondidos.
+Com o beat parado, você também pode tocar livremente esses botões e ouvir os instrumentos. Em um espaço ligado, escolher outra nota substitui o som daquele passo. Na bateria, os sons têm vozes separadas: um prato não corta o bumbo. Beats antigos podem manter combinações de bateria, identificadas como KIT; escolher um dos sete botões substitui a combinação pelo som escolhido.
 
-## Controles diretos
+- **Start:** toca/para o beat.
+- **Select:** abre/fecha o menu simples; a reprodução para ao abrir.
+- **A nos menus:** confirma.
+- **B nos menus:** volta. Na grade, B é sempre a nota Si/prato.
 
-| Controle | Na grade |
-|---|---|
-| D-pad / qualquer manche | Escolher passo e instrumento; inclui as três linhas da bateria |
-| A | Marcar/desmarcar passo; ao adicionar, ouvir imediatamente |
-| L2 / R2 | Descer/subir nota; na bateria, escolher bumbo/caixa/chimbal e ouvir |
-| Start | Tocar/parar |
-| Y | Abrir seis ações visíveis |
-| B | Parar e abrir o menu; voltar em painéis |
-| Select | Salvar e sair para Ports |
-| X | Reservado, sem ação |
+O rodapé mostra os sete atalhos, o som selecionado e se o passo está ligado. Não há combinações de botões, transposição escondida, páginas ou modo de ajustes na grade.
 
-Notas melódicas aparecem por nome (LA, DO, RE, MI, SOL). A nota selecionada mostra a oitava no rodapé. L2/R2 percorrem a escala pentatônica, sem transposição cromática; nos extremos a nota se mantém. Um passo vazio continua vazio: A adiciona a nota. Enquanto parado, selecionar outro passo também permite ouvir seu som.
+## Tudo na mesma tela
 
-Teclado: setas, Z/espaço (A), X (B), C (X), V (Y), Enter (Start), Escape/Shift direito (Select), Q/E (L2/R2). Ajustes FMG_KEY_*, FMG_BUTTON_* e direcionais existentes continuam suportados.
+As quatro pistas são BATERIA, BAIXO, GUITARRA e SYNTH. O tamanho é global: **4, 8, 16 ou 32 passos** para todos os instrumentos. Os passos aparecem juntos nos 480×272 pixels; o cursor nunca troca ou rola a página. Separadores a cada quatro passos ajudam a leitura. Quatro passos correspondem a um tempo.
 
-## Seis ações no Y
+Em 16 passos, SO abrevia SOL. Em 32, as notas usam A/C/D/E/F/G/B nas células compactas; o nome completo e a oitava aparecem no rodapé da seleção. Sons de bateria usam abreviações nas células e nome completo no rodapé. O tamanho menor preserva os passos escondidos para quando você aumentar novamente.
 
-- **TIMBRE:** A alterna Clássico, Brilho e Suave para a pista selecionada, com prévia imediata. São três variações próprias por instrumento, sem custo, downloads ou samples comerciais.
-- **COPIAR:** copia o trecho visível de até oito passos, nas quatro pistas.
-- **COLAR:** cola na página atual, inclusive em outro padrão. Respeita o tamanho ativo e pode ser desfeito.
-- **DESFAZER:** volta uma ação, com histórico de até 32 edições durante a sessão. Funciona para notas, timbres, colagens, ajustes e sequência. O histórico e a área de transferência não são salvos entre execuções.
-- **MUSICA:** organiza os três padrões em uma sequência de até oito posições.
-- **AJUSTES:** concentra tempo, tamanho, volume, mute, solo, nota, padrão e configuração de L2/R2. A grade continua com navegação direta.
+## Poucas funções no menu
 
-Os direcionais escolhem o cartão e A executa; B volta à grade. TIMBRE fica aberto para comparar os sons. Os demais ajustes ficam fora do caminho principal.
+CONTINUAR, TEMPO, TAMANHO, TROCAR BEAT, VARIAR O BEAT, DESFAZER, CONFIGURAR L/R e SALVAR E SAIR.
 
-## Juntar padrões em música
+Tempo (40–240 BPM), tamanho e beat usam esquerda/direita e A confirma. Três beats próprios estão prontos e editáveis: Night Drive (104 BPM), Sunny Pop (120 BPM), Broken Beat (96 BPM).
 
-Na tela MUSICA, esquerda/direita escolhem uma posição. A alterna o beat dessa posição; no bloco +, A acrescenta o padrão que estava sendo editado. Y remove a posição, mantendo pelo menos uma. Start inicia a sequência (ou para quando ela já está tocando). Cima/baixo alternam modo padrão/música; B volta. A posição tocando fica destacada.
+**VARIAR O BEAT** cria uma combinação nova de bateria, baixo, guitarra e synth, com preenchimentos de tons e notas da escala de Dó maior. Mantém tempo e tamanho. **DESFAZER** recupera a versão anterior, com histórico de até 32 edições na sessão. Assim dá para experimentar sem montar tudo do zero. A geração é local e gratuita, sem serviço de IA ou rede.
 
-A sequência se repete; a passagem ocorre ao final do padrão, sem reiniciar o dispositivo de áudio. Cada padrão conserva seu tempo e tamanho, sempre iguais para todos os instrumentos daquele padrão. O editor não muda sozinho de página enquanto você mexe: se estiver editando outro padrão durante uma música, a grade não mostra um marcador enganoso. O BPM no cabeçalho acompanha o padrão tocado.
+Copiar/colar, sequência de música, mute/solo, edição de timbres e painéis avançados foram retirados da interface para priorizar tocar e montar o beat. Os sons são sintetizados pelo próprio código, sem samples comerciais. A mixagem básica usa volumes fixos equilibrados; ao abrir saves antigos, mute/solo e modo de sequência são desativados, evitando instrumentos silenciosos por controles que não existem mais. Notas e timbres antigos continuam disponíveis na importação.
 
-## L2/R2 no M17
+## Configurar L1/R1/L2/R2 no M17
 
-O mapeamento anteriormente recuperado da unidade não identifica L2/R2. Controles SDL com gatilhos já mapeados funcionam diretamente. Caso não respondam, abra **Y → AJUSTES → MAPEAR L2 R2 → A**, pressione L2 e depois R2. B cancela. O aprendizado aceita botão digital ou tecla; gatilhos analógicos usam o mapeamento SDL padrão. A/B/X/Y/Start/Select ficam protegidos contra atribuição acidental.
+Mapeamentos SDL de ombros/gatilhos funcionam diretamente quando presentes. O mapeamento recuperado desta unidade não identifica todos esses botões. Se necessário: **Select → CONFIGURAR L/R → A**, pressione L1, R1, L2 e R2 na ordem mostrada. B cancela. A configuração fica apenas em `pocket-beats-controls.cfg`; não altera controls.sh nem outros jogos. O aprendizado digital e a persistência foram testados com joystick virtual, mas os botões físicos ainda precisam de confirmação.
 
-A configuração fica em `pocket-beats-controls.cfg`, junto ao save; não altera controls.sh nem outros jogos. Há também FMG_KEY_L2/R2 e FMG_BUTTON_L2/R2. Solte e aperte novamente para cada alteração. Aprendizado, persistência e cancelamento foram testados com joystick virtual; os gatilhos físicos ainda precisam de confirmação.
+Aceita também FMG_KEY_L1/R1/L2/R2 e FMG_BUTTON_L1/R1/L2/R2 explícitos. A captura aceita botões digitais ou teclas; gatilhos analógicos usam o mapeamento SDL padrão. Mapeamentos antigos de L2/R2 são lidos como Mi/Fá. A/B/X/Y/Start/Select são protegidos durante a configuração dos ombros.
 
-## Salvamento e som
+Teclado: setas; Z/espaço=A; Q/W/E/R=L1/R1/L2/R2; C=X; V=Y; X=B; Enter=Start; Escape/Shift direito=Select. Os ajustes FMG_KEY_* existentes prevalecem sobre esses padrões.
 
-Salva automaticamente enquanto parado após edições, e ao sair normalmente. Grava três padrões, notas, sons de bateria independentes, timbres, volumes, mute/solo, sequência, modo e posição de edição. Retoma parado. Saves antigos POCKETBEATS1 são migrados preservando o significado dos sons de bateria. O formato novo é POCKETBEATS2; **faça backup antes de voltar a um executável antigo**, que não lê esse formato.
+## Saves e validação
 
-O áudio roda por callback independente da tela e da escrita no SD. O banco original de três timbres por instrumento é preparado na inicialização (~5,7 MB de PCM); durante a reprodução há apenas mixagem. Bumbo, caixa e chimbal têm vozes separadas, além das três pistas melódicas. A prévia usa vozes próprias e não inicia o transporte. Timbres sintéticos, sem promessa de guitarra acústica realista.
+Salva automaticamente enquanto parado depois das edições e ao sair normalmente. Grava os três beats, notas ativas, atribuições de notas em espaços desligados, tempo, tamanho e posição. Retoma parado. Importa POCKETBEATS1 e POCKETBEATS2; grava **POCKETBEATS3**. Faça backup do save antes de usar esta revisão, pois executáveis anteriores não leem o novo formato.
 
-Sem dispositivo de áudio, a interface informa a ausência de som. Ferramenta livre, sem pontuação ou vitória/derrota. Não há exportação WAV no menu, gravação de microfone, tamanho por instrumento, swing, velocity por passo ou edição detalhada de síntese nesta revisão. [REFERENCIAS.md](REFERENCIAS.md) registra projetos externos pesquisados; nenhum código deles foi incorporado.
+O áudio usa callback independente da tela e da escrita no SD. O banco original é preparado antes de tocar (~10,2 MB de PCM), sem síntese pesada por amostra no callback. Não há compras, rede, anúncios ou assets pagos. Sem dispositivo de áudio, a interface informa a ausência de som. Não há pontuação ou vitória/derrota.
 
-Veja [BUILD.md](BUILD.md) e [VALIDATION.json](VALIDATION.json). **Nenhum cartão foi alterado para instalar a revisão 0.4.**
+[BUILD.md](BUILD.md) descreve compilação e instalação aditiva; [VALIDATION.json](VALIDATION.json) registra os testes. [REFERENCIAS.md](REFERENCIAS.md) registra a pesquisa de outros programas. Nenhum código deles foi incorporado. **Esta revisão não foi instalada no cartão.**

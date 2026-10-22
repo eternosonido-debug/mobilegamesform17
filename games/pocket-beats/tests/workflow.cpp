@@ -10,62 +10,33 @@ int main() {
   using namespace pocketbeats;
   Controller c;
   c.action(A);
+  c.state.track = 0;
+  c.state.cursor = 1;
+  c.state.current().notes[0][1] = 0;
+  Control keys[] = {ToneDo, ToneRe, ToneMi, ToneFa, X, Y, B};
+  for (int i = 0; i < 7; ++i) {
+    c.action(keys[i]);
+    check(c.state.current().notes[0][1] == 0 &&
+              c.state.current().chosen[0][1] == 1 << i && c.previewRequested,
+          "seven percussion choices");
+  }
+  c.action(A);
+  check(c.state.current().notes[0][1] == 64, "crash on");
+  c.action(A);
+  check(c.state.current().notes[0][1] == 0 &&
+            c.state.current().chosen[0][1] == 64,
+        "off remembers crash");
   auto original = c.state.current().notes;
-  c.action(A);
-  check(c.state.current().notes[0][0] == (original[0][0] ^ 1),
-        "toggle only kick");
+  c.vary();
+  check(c.state.current().notes != original, "variation unchanged");
   c.undo();
-  check(c.state.current().notes == original, "undo drums");
-  c.state.drumLane = 1;
-  c.action(A);
-  check(c.previewRequested && c.previewNote == 2, "snare preview");
-  c.copy();
-  c.state.cursor = 8;
-  c.paste();
-  for (int t = 0; t < 4; ++t)
-    for (int i = 0; i < 8; ++i)
-      check(c.state.current().notes[t][i] == c.state.current().notes[t][i + 8],
-            "copy eight steps across tracks");
-  c.undo();
-  check(c.state.cursor == 8, "undo keeps edit location");
-  c.state.current().length = 4;
-  c.state.cursor = 0;
-  c.copy();
-  check(c.copied == 4, "four-step copy bound");
-  c.state.chooseSlot(1);
-  c.state.cursor = 8;
-  c.paste();
-  check(c.state.current().notes[0][8] == c.clipboard[0][0],
-        "paste another pattern");
-  c.action(Y);
-  c.tool = 0;
-  int style = c.state.current().timbre[c.state.track];
-  c.action(A);
-  check(c.state.current().timbre[c.state.track] == (style + 1) % 3 &&
-            c.previewRequested,
-        "timbre instant preview");
-  c.tool = 4;
-  c.action(A);
-  check(c.song, "song screen");
-  c.songCursor = c.state.orderLength;
-  c.action(A);
-  check(c.state.orderLength == 5, "append song beat");
-  c.action(Y);
-  check(c.state.orderLength == 4, "remove song beat");
-  c.action(Start);
-  check(c.state.songMode && c.state.playing, "song transport");
-  std::string path = "/tmp/pocket-beats-workflow-" + std::to_string(getpid());
-  c.state.drumLane = 2;
-  check(c.state.save(path), "save2");
+  check(c.state.current().notes == original, "undo variation");
+  std::string path = "/tmp/pocket-workflow-" + std::to_string(getpid());
+  check(c.state.save(path), "save3");
   Session loaded;
-  check(loaded.load(path) &&
-            loaded.current().notes == c.state.current().notes &&
-            loaded.order == c.state.order && loaded.orderLength == 4 &&
-            loaded.drumLane == 2 && loaded.songMode && !loaded.playing &&
-            loaded.current().timbre == c.state.current().timbre,
-        "new save roundtrip");
-  // Old saves retain their musical meaning when converted to independent drum
-  // masks.
+  check(loaded.load(path) && loaded.current().notes == original &&
+            loaded.current().chosen[0][1] == 64 && !loaded.playing,
+        "inactive assignment saved");
   Session old;
   std::ofstream f(path);
   f << "POCKETBEATS1\n0 0 0\n";
@@ -80,12 +51,30 @@ int main() {
   }
   f.close();
   Session migrated;
-  check(migrated.load(path), "legacy save load");
+  check(migrated.load(path), "legacy save");
   int masks[] = {0, 1, 2, 4, 5, 6, 4, 4, 4};
   for (int i = 0; i < 32; ++i)
-    check(migrated.current().notes[0][i] == masks[i % 9],
-          "legacy drum conversion");
+    check(migrated.current().notes[0][i] == masks[i % 9], "legacy percussion");
+  std::ofstream modern(path);
+  modern << "POCKETBEATS2\n0 1 0\n0 1 0 4 0 1 2 1 0 0 0 0\n";
+  for (auto &p : old.patterns) {
+    modern << p.length << ' ' << p.bpm << ' ' << p.solo << '\n';
+    for (int style : p.timbre)
+      modern << style << ' ';
+    modern << '\n';
+    for (int t = 0; t < 4; ++t) {
+      modern << p.volume[t] << ' ' << p.mute[t];
+      for (int n : p.notes[t])
+        modern << ' ' << n;
+      modern << '\n';
+    }
+  }
+  modern.close();
+  Session version2;
+  check(version2.load(path) &&
+            version2.current().chosen[1][0] == old.current().notes[1][0],
+        "version2 assignment migration");
   std::remove(path.c_str());
-  std::cout << "PASS direct edit/preview, independent drums, undo, copy/paste, "
-               "timbres, song editing and legacy saves\n";
+  std::cout << "PASS seven drums, off-step assignment, variation/undo and save "
+               "migration\n";
 }
