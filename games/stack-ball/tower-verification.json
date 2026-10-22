@@ -1,0 +1,22 @@
+{
+  "fixed_step_hz": 120,
+  "policy": "press only when a one-step lookahead reports a safe break; otherwise release",
+  "runs": [
+    {
+      "tower": 1,
+      "platforms": 18,
+      "ticks": 716
+    },
+    {
+      "tower": 2,
+      "platforms": 24,
+      "ticks": 1013
+    },
+    {
+      "tower": 3,
+      "platforms": 30,
+      "ticks": 1715
+    }
+  ],
+  "note": "Rules simulation only, not a hardware test or a minimum-time claim"
+}

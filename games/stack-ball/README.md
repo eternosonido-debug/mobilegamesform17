@@ -1,18 +1,41 @@
-# Tower Break
+# Tower Break 0.1.0
 
-Status: especificação, ainda não implementado no M17.
+Jogo nativo C++11/SDL2 de descer uma torre quebrando plataformas, com três torres originais. A pasta `stack-ball` é histórica; o executável, o save e a entrada em Ports usam **Tower Break**. Arte, sons e níveis próprios, sem copiar código/assets dos candidatos pesquisados.
 
-## Objetivo e dinâmica
-Destruir segmentos de plataformas na descida de uma torre.
+## Como jogar
 
-## Regras completas do MVP
-Queda e rebote; evitar segmentos perigosos; combos; vitória na base; 3 torres. Jogador inicia em menu, vê tutorial, enfrenta pelo menos três níveis, recebe feedback de erro/acerto, pode pausar, reiniciar e sair. Não permitir estados impossíveis. Usar progresso local offline.
+Segure **A** para acelerar e quebrar os trechos coloridos. Solte A para frear o ataque e rebater sobre a plataforma, inclusive em segmentos perigosos. Atacar um trecho escuro com listras vermelhas quebra a bola e termina a tentativa. Soltar A protege na próxima colisão; não congela a rotação nem suspende a bola no ar.
+
+A torre gira automaticamente. Os direcionais permitem ajustar sua rotação para a esquerda/direita. A bola fica na frente da torre; o painel SEGURO/PERIGO informa o segmento atualmente sob ela. O giro continua enquanto você espera, e todas as plataformas possuem setores seguros. Não há tempo limite, vidas, rede ou compras.
+
+Cada plataforma quebrada aumenta o combo; rebater sem atacar zera o combo. Os pontos de cada quebra são `10 × combo`. A velocidade vertical é limitada e cada quebra restabelece a distância até a próxima plataforma, evitando atravessar a pilha inteira em poucos frames. Chegar à base vence e desbloqueia a próxima torre; a terceira encerra a campanha.
+
+| Torre | Plataformas | Setores perigosos em 12 | Rotação automática |
+|---|---:|---:|---:|
+| 1 | 18 | 2 | 72 graus/s |
+| 2 | 24 | 3 | 108 graus/s |
+| 3 | 30 | 4 | 144 graus/s |
+
+As posições dos perigos mudam entre plataformas por uma regra fixa versionada. As três torres foram concluídas na simulação das regras com uma sequência de ataques seguros. Isso prova alcance da base no modelo, sem medir a dificuldade percebida nem substituir teste humano.
 
 ## Controles
-A mantido para cair; soltar para parar; Start pausa; Select retorna ao menu após confirmação. Validar botões reais do M17 e oferecer teclado no PC.
 
-## Visual
-Camadas coloridas e estilhaços. Tela 480x272, sugerido canvas lógico 240x136 e escala 2x sem suavização. Arte original com identidade própria, inspirada na era 16 bits. Interface legível na tela pequena.
+- **A mantido:** atacar/descer. Soltar: rebater sem quebrar a plataforma.
+- **D-pad ou qualquer um dos dois manches, esquerda/direita:** ajustar rotação. Cima/baixo navegam nos menus.
+- **B ou Start:** pausar. B retorna da pausa.
+- **Select:** abrir confirmação para salvar e sair ao Ports; A confirma, B cancela.
+- **X/Y:** sem função nesta versão.
 
-## Critérios de aceite
-Loop jogável, três níveis válidos, controles físicos, build Linux reproduzível, testes de regras, FPS medido no M17. Não copiar assets nem código de outros jogos comerciais.
+Teclado: Z/espaço=A, setas para os direcionais, X=B, Enter=Start e Escape=Select. Há suporte às variáveis `FMG_KEY_*`, `FMG_BUTTON_*` e aos eixos configuráveis da coleção. A mantido é lido tanto pelo teclado quanto por controlador SDL ou joystick bruto; as configurações alternativas foram testadas no computador. O launcher carrega `fmg-test/controls.sh` da unidade.
+
+O jogo exige soltar A depois de fechar o tutorial, retomar ou cancelar a saída, evitando ataque acidental com o botão usado no menu. Perder o foco pausa automaticamente. O menu oferece continuar, reiniciar, trocar entre torres desbloqueadas, silenciar e sair. Na derrota, A reinicia e B abre o menu; na vitória, A avança ou volta ao menu ao concluir a campanha.
+
+## Implementação e save
+
+A física avança em passos inteiros de 1/120 s, independentemente do desenho. A acumulação de tempo por frame é limitada para não tentar recuperar pausas longas de sistema. O desenho usa perspectiva 2.5D com elipses, cilindro e setores coloridos, sem engine 3D. Uma tabela angular é calculada uma vez e usada para desenhar as plataformas sem trigonometria por pixel a cada frame. Partículas e sons dão retorno às quebras.
+
+`tower-break.save` guarda torre, desbloqueios, som, plataforma, ângulo, altura, velocidade, combo, pontos, tempo lógico e derrota. A escrita usa arquivo temporário e rename. Há save nos menus, na saída e no resultado; progresso de quebras também é salvo ao soltar A e passar o intervalo de autosave. O estado de A não é persistido: ao retomar, é preciso soltá-lo antes de atacar. Saves inválidos são rejeitados sem alterar outros arquivos. Não lê nem altera saves de outros jogos.
+
+Regras/save em `src/game_logic.hpp`, desenho em `src/renderer.hpp`, entrada em `src/input.hpp` e aplicação em `src/main.cpp`. Componentes genéricos próprios reutilizados sob [LICENSE-FMG](../../LICENSE-FMG). Veja [REFERENCIAS.md](REFERENCIAS.md), [BUILD.md](BUILD.md) e [VALIDACAO.md](VALIDACAO.md).
+
+**Em desenvolvimento para console:** executável ARM compilado e inspecionado; ainda não executado no M17 físico. FPS, áudio e controles reais permanecem pendentes. Esta entrega não instalou arquivos no cartão.

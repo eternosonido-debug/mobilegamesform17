@@ -45,6 +45,8 @@ Rotate Rings ganhou uma [primeira versão nativa](games/rotate-rings), com 20 fa
 
 Color Pop (pasta histórica [toon-blast](games/toon-blast)) possui agora versão nativa inicial com 20 fases de grupos, gravidade/reposição, metas, combos, pulso, animações e save. Soluções verificadas e ARM compilado; teste no M17 pendente.
 
+Tower Break (pasta histórica [stack-ball](games/stack-ball)) possui versão nativa inicial com três torres, queda/rebote, plataformas perigosas, combos, partículas e save. Torres concluídas na simulação e ARM compilado; hardware pendente.
+
 ## Pendências técnicas
 - Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.
 - Portar o Block Out de protótipo HTML para o mesmo stack nativo adotado nos jogos existentes; testar controles e desempenho no console.
