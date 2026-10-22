@@ -12,14 +12,15 @@ inline std::vector<MusicEvent> music(int song) {
   for (auto n : melody(song))
     out.push_back(
         {int(int64_t(n.ms) * Rate / 1000), n.sample, n.harmony ? 50 : 110});
-  const int roots[] = {0, 2, 9}, prog[] = {0, 5, 7, 0};
+
   for (int beat = 0; beat * 60000 / bpm(song) < intro(song) + 180000; ++beat) {
     int ms = beat * 60000 / bpm(song);
     out.push_back({int(int64_t(ms) * Rate / 1000), beat % 2 ? 25 : 24, 100});
     out.push_back({int(int64_t(ms) * Rate / 1000), 26, 45});
     if (ms >= intro(song) && beat % 2 == 0)
       out.push_back({int(int64_t(ms) * Rate / 1000),
-                     (roots[song] + prog[((beat - 4) / 16) % 4]) % 12, 95});
+                     (rootNote(song) + chordOffset(song, (beat - 4) / 16)) % 12,
+                     95});
   }
   std::stable_sort(out.begin(), out.end(),
                    [](const MusicEvent &a, const MusicEvent &b) {

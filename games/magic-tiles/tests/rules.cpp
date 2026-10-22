@@ -3,7 +3,7 @@
 #include <iostream>
 int main() {
   using namespace tiles;
-  for (int song = 0; song < 3; ++song)
+  for (int song = 0; song < SongCount; ++song)
     for (int difficulty = 0; difficulty < 3; ++difficulty) {
       State s(song, difficulty);
       assert(duration(song) >= 180000 && !s.notes.empty());
@@ -44,13 +44,21 @@ int main() {
   assert(!practice.failed() && practice.won());
   Settings cfg;
   cfg.offset = -75;
-  cfg.song = 2;
+  cfg.song = 9;
+  cfg.best[29] = 765432;
   cfg.practice = true;
   assert(cfg.save("tiles-test.save"));
   Settings loaded;
   assert(loaded.load("tiles-test.save") && loaded.offset == -75 &&
-         loaded.song == 2);
+         loaded.song == 9 && loaded.best[29] == 765432);
   std::ofstream("tiles-test.save") << "TILES1 9";
-  assert(!loaded.load("tiles-test.save") && loaded.song == 2);
+  assert(!loaded.load("tiles-test.save") && loaded.song == 9 &&
+         loaded.best[29] == 765432);
+  std::ofstream legacy("tiles-test.save");
+  legacy << "TILES1 2 1 0 0 0 123 0 0 0 0 0 0 0 456\n";
+  legacy.close();
+  assert(loaded.load("tiles-test.save") && loaded.song == 2 &&
+         loaded.best[0] == 123 && loaded.best[8] == 456 &&
+         loaded.best[29] == 0);
   std::remove("tiles-test.save");
 }

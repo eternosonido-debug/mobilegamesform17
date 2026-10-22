@@ -1,6 +1,6 @@
-# Magic Tiles 0.1.0
+# Magic Tiles 0.2.0
 
-Jogo rítmico original, offline e nativo C++11/SDL2. Quatro pistas grandes em A/B/X/Y, três músicas próprias e três dificuldades por música. Áudio sintetizado por amostras próprias, com relógio independente da interface, pausa, treino, ajuste de latência e recordes locais. Sem músicas, charts, personagens ou arte de jogos comerciais.
+Jogo rítmico original, offline e nativo C++11/SDL2. Quatro pistas grandes em A/B/X/Y, dez músicas próprias e três dificuldades por música. Áudio sintetizado por amostras próprias, com relógio independente da interface, pausa, treino, ajuste de latência e recordes locais. Sem músicas, charts, personagens ou arte de jogos comerciais.
 
 ## Como jogar
 
@@ -11,6 +11,13 @@ Toque o botão da pista quando a nota passar pela linha inferior. Da esquerda pa
 | Brisa Digital | 96 | 3:04,500 | 144 / 288 / 612 |
 | Rua Neon | 112 | 3:04,142 | 168 / 336 / 714 |
 | Pulso Noturno | 128 | 3:03,875 | 192 / 384 / 816 |
+| Mar De Vidro | 88 | 3:04,727 | 132 / 264 / 561 |
+| Sol De Cobre | 104 | 3:04,307 | 156 / 312 / 663 |
+| Chuva Lilas | 120 | 3:04,000 | 180 / 360 / 765 |
+| Orbita Azul | 100 | 3:04,400 | 150 / 300 / 638 |
+| Luz Da Serra | 116 | 3:04,068 | 174 / 348 / 740 |
+| Vento Solar | 132 | 3:03,818 | 198 / 396 / 842 |
+| Amanhecer | 140 | 3:03,714 | 210 / 420 / 893 |
 
 Cada faixa tem contagem inicial de quatro batidas, 180 s de conteúdo musical e 2 s de cauda. A vitória só acontece ao terminar a faixa, com mais de três minutos de relógio de áudio ativo; menus e pausas não contam. É possível perder antes disso. As composições usam motivos próprios, progressão harmônica, baixo, melodia, bumbo, caixa e chimbal sintetizados. Os mesmos eventos melódicos geram a música e os charts, evitando mapas sem relação com o som.
 
@@ -22,7 +29,7 @@ Cada faixa tem contagem inicial de quatro batidas, 180 s de conteúdo musical e 
 - Nota perdida: reduz 5 de vida e zera combo. Pressionar sem uma nota na janela reduz 2.
 - Um acerto recupera 1 de vida. Vida zerada encerra a tentativa; o modo Treino permite continuar sem gravar recorde.
 
-A pontuação é normalizada até 1.000.000; uma execução perfeita atinge esse valor em qualquer mapa. O menu mostra o recorde da música/dificuldade selecionada. As três músicas estão disponíveis desde o início. A dificuldade muda a quantidade de notas, sem alterar a música.
+A pontuação é normalizada até 1.000.000; uma execução perfeita atinge esse valor em qualquer mapa. O menu mostra o recorde da música/dificuldade selecionada. As dez músicas estão disponíveis desde o início. A dificuldade muda a quantidade de notas, sem alterar a música.
 
 ## Controles e menu
 
@@ -36,7 +43,7 @@ Entrada configurável pelas variáveis `FMG_KEY_*`, `FMG_BUTTON_*` e eixos já u
 
 ## Save e áudio
 
-`magic-tiles.save` registra seleção, dificuldade, atraso, treino, som e os nove recordes. A escrita usa arquivo temporário e rename. Uma música interrompida reinicia do começo; não há retomada no meio da faixa. Outros saves e jogos não são alterados.
+`magic-tiles.save` registra seleção, dificuldade, atraso, treino, som e os trinta recordes. Saves TILES1 anteriores são importados, mantendo os nove recordes originais; o novo formato TILES2 guarda os 30. A escrita usa arquivo temporário e rename. Uma música interrompida reinicia do começo; não há retomada no meio da faixa. Outros saves e jogos não são alterados.
 
 O callback SDL mistura amostras pré-calculadas e publica a posição de reprodução por operações atômicas. A interface lê esse relógio, com interpolação limitada ao buffer; não agenda música pelo frame de vídeo. A pausa congela o relógio. A latência real de saída ainda depende do driver/aparelho e precisa de calibração; os testes em computador não comprovam a sincronização percebida no M17. O modo sem som mantém o relógio ativo; é necessário um dispositivo de áudio SDL válido para iniciar.
 

@@ -12,34 +12,61 @@ struct Note {
   int ms, lane, sample, step;
   bool harmony;
 };
+constexpr int SongCount = 10;
+inline int songIndex(int song) {
+  return std::max(0, std::min(SongCount - 1, song));
+}
 inline int bpm(int song) {
-  const int values[] = {96, 112, 128};
-  return values[std::max(0, std::min(2, song))];
+  const int values[] = {96, 112, 128, 88, 104, 120, 100, 116, 132, 140};
+  return values[songIndex(song)];
 }
 inline const char *title(int song) {
-  const char *names[] = {"BRISA DIGITAL", "RUA NEON", "PULSO NOTURNO"};
-  return names[std::max(0, std::min(2, song))];
+  const char *names[] = {"BRISA DIGITAL", "RUA NEON",     "PULSO NOTURNO",
+                         "MAR DE VIDRO",  "SOL DE COBRE", "CHUVA LILAS",
+                         "ORBITA AZUL",   "LUZ DA SERRA", "VENTO SOLAR",
+                         "AMANHECER"};
+  return names[songIndex(song)];
+}
+inline int rootNote(int song) {
+  const int roots[] = {0, 2, 9, 5, 7, 4, 11, 2, 8, 0};
+  return roots[songIndex(song)];
+}
+inline int chordOffset(int song, int bar) {
+  const int progressions[][4] = {
+      {0, 5, 7, 0}, {0, 5, 7, 0}, {0, 5, 7, 0}, {0, 7, 5, 7}, {0, 9, 5, 7},
+      {0, 5, 3, 7}, {0, 7, 9, 5}, {0, 5, 9, 7}, {0, 3, 5, 7}, {0, 7, 5, 0}};
+  return progressions[songIndex(song)][bar % 4];
 }
 inline int intro(int song) { return 240000 / bpm(song); }
 inline int duration(int song) { return intro(song) + 180000 + 2000; }
 inline std::vector<Note> melody(int song) {
   std::vector<Note> out;
-  const int motif[] = {0, 1, 2, 1, 3, 2, 0, 2, 1, 3, 2, 0, 2, 1, 3, 0};
-  const int major[] = {0, 4, 7, 11}, minor[] = {0, 3, 7, 10},
-            roots[] = {0, 2, 9}, progression[] = {0, 5, 7, 0};
+  song = songIndex(song);
+  const int motifs[][16] = {{0, 1, 2, 1, 3, 2, 0, 2, 1, 3, 2, 0, 2, 1, 3, 0},
+                            {0, 2, 1, 3, 1, 0, 2, 3, 2, 0, 3, 1, 0, 3, 2, 1},
+                            {0, 3, 2, 1, 0, 2, 3, 1, 2, 1, 3, 0, 3, 2, 0, 1},
+                            {0, 1, 0, 2, 1, 2, 1, 3, 2, 3, 2, 1, 3, 1, 2, 0},
+                            {0, 2, 3, 2, 1, 3, 0, 1, 3, 1, 2, 0, 1, 0, 3, 2},
+                            {3, 2, 0, 1, 2, 0, 1, 0, 1, 3, 2, 3, 0, 2, 1, 3},
+                            {0, 3, 1, 2, 3, 1, 0, 2, 1, 0, 2, 3, 2, 1, 3, 0},
+                            {0, 1, 3, 2, 1, 3, 2, 0, 2, 0, 1, 3, 3, 2, 0, 1},
+                            {2, 0, 3, 1, 0, 2, 1, 3, 1, 3, 0, 2, 3, 1, 2, 0},
+                            {0, 2, 1, 0, 3, 1, 2, 3, 0, 3, 2, 1, 2, 0, 1, 3}};
+  const int major[] = {0, 4, 7, 11}, minor[] = {0, 3, 7, 10};
   for (int i = 0; i * 30000 / bpm(song) < 180000; ++i) {
     if (i % 16 == 15)
       continue;
-    int lane = (motif[i % 16] + i / 32 + song) % 4,
-        root = (roots[song] + progression[(i / 32) % 4]) % 12;
-    int sample = 12 + (root + (song ? minor[lane] : major[lane])) % 12;
+    int lane = (motifs[song < 3 ? 0 : song][i % 16] + i / 32 + song) % 4,
+        root = (rootNote(song) + chordOffset(song, i / 32)) % 12;
+    int sample = 12 + (root + (song % 3 ? minor[lane] : major[lane])) % 12;
     out.push_back(
         {intro(song) + i * 30000 / bpm(song), lane, sample, i, false});
     if (i % 8 == 0) {
       int other = (lane + 2) % 4;
-      out.push_back({intro(song) + i * 30000 / bpm(song), other,
-                     12 + (root + (song ? minor[other] : major[other])) % 12, i,
-                     true});
+      out.push_back(
+          {intro(song) + i * 30000 / bpm(song), other,
+           12 + (root + (song % 3 ? minor[other] : major[other])) % 12, i,
+           true});
     }
   }
   return out;
@@ -116,11 +143,11 @@ struct State {
 struct Settings {
   int song = 0, difficulty = 0, offset = 0;
   bool muted = false, practice = false;
-  std::array<int, 9> best{{0, 0, 0, 0, 0, 0, 0, 0, 0}};
+  std::array<int, SongCount * 3> best{};
   bool save(const std::string &path) const {
     std::string tmp = path + ".tmp";
     std::ofstream f(tmp);
-    f << "TILES1 " << song << ' ' << difficulty << ' ' << offset << ' ' << muted
+    f << "TILES2 " << song << ' ' << difficulty << ' ' << offset << ' ' << muted
       << ' ' << practice;
     for (int n : best)
       f << ' ' << n;
@@ -134,11 +161,12 @@ struct Settings {
     Settings g;
     if (!(f >> magic >> g.song >> g.difficulty >> g.offset >> g.muted >>
           g.practice) ||
-        magic != "TILES1" || g.song < 0 || g.song > 2 || g.difficulty < 0 ||
+        (magic != "TILES1" && magic != "TILES2") || g.song < 0 ||
+        g.song >= (magic == "TILES1" ? 3 : SongCount) || g.difficulty < 0 ||
         g.difficulty > 2 || g.offset < -150 || g.offset > 150)
       return false;
-    for (int &n : g.best)
-      if (!(f >> n) || n < 0 || n > 1000000)
+    for (int i = 0; i < (magic == "TILES1" ? 9 : SongCount * 3); ++i)
+      if (!(f >> g.best[i]) || g.best[i] < 0 || g.best[i] > 1000000)
         return false;
     *this = g;
     return true;

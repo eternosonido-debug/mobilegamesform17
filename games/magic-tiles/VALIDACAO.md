@@ -1,3 +1,7 @@
+# Revisão 0.2.0 — dez músicas
+
+Os quatro grupos locais passaram com sanitizadores: 30 charts concluídos perfeitamente, eventos de áudio sincronizados para as dez faixas, callback independente, pausa, controles e migração TILES1 → TILES2 preservando recordes. As três composições anteriores mantêm seus mapas; sete novas têm motivos, tonalidades, progressões e BPM próprios. Cada faixa contém 180 segundos de música, além de contagem inicial e cauda. Validação musical percebida e execução no M17 permanecem pendentes.
+
 # Validação — Magic Tiles 0.1.0, 22/10/2026
 
 - Compilação Apple Clang/C++11, SDL2, `-Wall -Wextra -pedantic`, AddressSanitizer e UndefinedBehaviorSanitizer: sem avisos ou diagnósticos nos testes.

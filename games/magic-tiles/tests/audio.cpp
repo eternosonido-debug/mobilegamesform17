@@ -3,7 +3,7 @@
 #include <iostream>
 int main() {
   using namespace tiles;
-  for (int song = 0; song < 3; ++song) {
+  for (int song = 0; song < SongCount; ++song) {
     auto events = music(song);
     for (auto n : chart(song, 2)) {
       int frame = int(int64_t(n.ms) * Rate / 1000);

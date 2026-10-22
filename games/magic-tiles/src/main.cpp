@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
           if (choice == 0)
             scene = Tutorial;
           else if (choice == 1)
-            cfg.song = (cfg.song + 1) % 3;
+            cfg.song = (cfg.song + 1) % SongCount;
           else if (choice == 2)
             cfg.difficulty = (cfg.difficulty + 1) % 3;
           else if (choice == 3)

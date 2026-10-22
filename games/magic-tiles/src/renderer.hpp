@@ -61,10 +61,11 @@ struct Renderer {
       c.line(x + 3, y - 3, x + 19, y - 3, paper);
       c.disc(x + 11, y + 1, 1, Paint(34, 48, 72));
     }
-    const char *song1[] = {"BRISA", "RUA", "PULSO"},
-               *song2[] = {"DIGITAL", "NEON", "NOTURNO"};
-    c.text(148, 27, song1[s.song], paper);
-    c.text(148, 38, song2[s.song], paper);
+    std::string name = title(s.song);
+    size_t space = name.find(' ');
+    c.text(148, 27, name.substr(0, space), paper);
+    if (space != std::string::npos)
+      c.text(148, 38, name.substr(space + 1), paper);
     c.text(148, 55, s.practice ? "TREINO" : "VIDA", Paint(167, 189, 210));
     c.round(148, 66, 80, 5, 2, Paint(45, 59, 82));
     c.rect(148, 66, 80 * s.life / 100, 5, color(0));
