@@ -21,3 +21,7 @@ A base existente possui controle de ambos os manches/D-pad e A/B/X/Y, primitivas
 Não tratar nenhum dos projetos encontrados como jogo nativo M17 pronto. Reutilizar primeiro a infraestrutura própria SDL2/ARM e avaliar isoladamente qualquer algoritmo externo antes de copiar ou traduzir. ScrewJam permanece como candidato para estudar organização de camadas e suporte; sua implementação não foi adaptada nesta etapa. Caso código derivado dele seja incorporado, registrar exatamente a origem, alterações e termos aplicáveis no módulo.
 
 Estado ao concluir esta pesquisa: especificação do Screw Puzzle existente; implementação nativa ainda não iniciada. Não foi executado nenhum candidato no M17.
+
+## Resultado da implementação — 22/10/2026
+
+Implementada a versão 0.1.0 original C++11/SDL2, com três fases próprias e busca de soluções. Nenhum código, nível ou asset dos candidatos externos foi copiado ou traduzido. Foram reutilizados os arquivos próprios de entrada, fonte/primitivas e efeitos sonoros do Block Out, sob LICENSE-FMG, mais o helper genérico `shared/fmg-runtime/src/direction_input.hpp`. A pesquisa poupou a tentativa de portar um stack Flutter inadequado à base atual. Testes locais, build ARM e inspeção de símbolos documentados em VALIDACAO.md; hardware pendente.
