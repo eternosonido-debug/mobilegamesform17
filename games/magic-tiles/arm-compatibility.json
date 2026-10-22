@@ -1,0 +1,21 @@
+{
+  "target": "arm-linux-gnueabi.2.29 cortex_a9 (ARMv7/VFPv3 baseline)",
+  "interpreter": [
+    "/lib/ld-linux.so.3"
+  ],
+  "libraries": [
+    "magic-tiles",
+    "libSDL2-2.0.so.0",
+    "libpthread.so.0",
+    "libc.so.6",
+    "libdl.so.2",
+    "ld-linux.so.3",
+    "libm.so.6",
+    "libEGL.so",
+    "libIMGegl.so",
+    "libsrv_um.so"
+  ],
+  "strong_imports_checked": 534,
+  "failures": [],
+  "note": "Static compatibility inspection; not runtime or hardware test"
+}

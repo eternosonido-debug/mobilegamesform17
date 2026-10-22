@@ -47,6 +47,8 @@ Color Pop (pasta histórica [toon-blast](games/toon-blast)) possui agora versão
 
 Tower Break (pasta histórica [stack-ball](games/stack-ball)) possui versão nativa inicial com três torres de 640/680/720 andares (conclusão exige mais de três minutos ativos), queda/rebote, plataformas perigosas, combos, partículas e save. Torres concluídas na simulação e ARM compilado; hardware pendente.
 
+Magic Tiles ganhou uma [primeira versão nativa](games/magic-tiles) com três músicas originais de mais de três minutos, quatro pistas, nove charts, treino, ajuste de latência e recordes. Áudio independente da interface; ARM compilado, teste físico pendente.
+
 ## Pendências técnicas
 - Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.
 - Portar o Block Out de protótipo HTML para o mesmo stack nativo adotado nos jogos existentes; testar controles e desempenho no console.
