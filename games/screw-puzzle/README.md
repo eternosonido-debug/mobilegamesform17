@@ -1,6 +1,6 @@
 # Screw Puzzle
 
-**Status:** especificação aprovada para desenvolvimento; NÃO implementado/validado no M17.
+**Status:** pesquisa prévia concluída em 22/10/2026; implementação nativa ainda não iniciada nem validada no M17. Veja [REFERENCIAS.md](REFERENCIAS.md).
 **Prioridade:** 2.
 
 ## Conceito e objetivo
