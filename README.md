@@ -43,6 +43,8 @@ Screw Puzzle também possui agora uma [primeira versão nativa jogável](games/s
 
 Rotate Rings ganhou uma [primeira versão nativa](games/rotate-rings), com 20 fases originais de dificuldade progressiva, geometria de liberação, animações, desfazer e progresso salvo. Build ARM compilado; teste no aparelho pendente.
 
+Color Pop (pasta histórica [toon-blast](games/toon-blast)) possui agora versão nativa inicial com 20 fases de grupos, gravidade/reposição, metas, combos, pulso, animações e save. Soluções verificadas e ARM compilado; teste no M17 pendente.
+
 ## Pendências técnicas
 - Localizar fontes e scripts de build dos cinco jogos existentes e identificar o compilador/ambiente Linux do M17.
 - Portar o Block Out de protótipo HTML para o mesmo stack nativo adotado nos jogos existentes; testar controles e desempenho no console.

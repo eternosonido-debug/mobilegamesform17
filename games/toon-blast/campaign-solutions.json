@@ -1,0 +1,333 @@
+[
+  {
+    "level": 1,
+    "seed": 7139,
+    "actions": [
+      11,
+      19
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 2,
+    "seed": 7312,
+    "actions": [
+      0,
+      23,
+      16
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 3,
+    "seed": 7485,
+    "actions": [
+      23,
+      14,
+      1
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 4,
+    "seed": 7658,
+    "actions": [
+      6,
+      2,
+      43
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 5,
+    "seed": 7831,
+    "actions": [
+      10,
+      31,
+      44,
+      9
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 6,
+    "seed": 8004,
+    "actions": [
+      29,
+      24,
+      68,
+      17,
+      5
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 7,
+    "seed": 8177,
+    "actions": [
+      0,
+      8,
+      11,
+      53,
+      5
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 8,
+    "seed": 8350,
+    "actions": [
+      0,
+      2,
+      3,
+      15,
+      77,
+      0
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 9,
+    "seed": 8523,
+    "actions": [
+      4,
+      9,
+      15,
+      14,
+      67,
+      4,
+      0
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 10,
+    "seed": 8696,
+    "actions": [
+      32,
+      10,
+      2,
+      28,
+      72,
+      0,
+      42
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 11,
+    "seed": 8869,
+    "actions": [
+      15,
+      0,
+      70,
+      17,
+      27,
+      42,
+      2
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 12,
+    "seed": 9042,
+    "actions": [
+      0,
+      5,
+      52,
+      21,
+      12,
+      19,
+      56
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 13,
+    "seed": 9215,
+    "actions": [
+      16,
+      24,
+      57,
+      12,
+      17,
+      22,
+      65,
+      0,
+      7,
+      17,
+      1,
+      63,
+      17
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 14,
+    "seed": 9388,
+    "actions": [
+      0,
+      1,
+      24,
+      74,
+      24,
+      0,
+      59,
+      9,
+      0,
+      45,
+      1
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 15,
+    "seed": 9561,
+    "actions": [
+      16,
+      25,
+      22,
+      8,
+      8,
+      3,
+      66,
+      3,
+      19,
+      19,
+      48,
+      24,
+      31,
+      5,
+      15,
+      49,
+      4
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 16,
+    "seed": 9734,
+    "actions": [
+      7,
+      23,
+      4,
+      72,
+      7,
+      14,
+      8,
+      42,
+      2,
+      29,
+      29,
+      0,
+      1
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 17,
+    "seed": 10338,
+    "actions": [
+      15,
+      22,
+      53,
+      7,
+      26,
+      32,
+      4,
+      20,
+      51,
+      5,
+      24,
+      46,
+      25
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 18,
+    "seed": 10080,
+    "actions": [
+      11,
+      17,
+      2,
+      67,
+      16,
+      2,
+      16,
+      64,
+      23,
+      10,
+      2,
+      3,
+      4,
+      0,
+      46
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 19,
+    "seed": 10253,
+    "actions": [
+      35,
+      21,
+      22,
+      0,
+      22,
+      69,
+      24,
+      15,
+      3,
+      10,
+      42,
+      11,
+      2,
+      7,
+      1
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  },
+  {
+    "level": 20,
+    "seed": 10857,
+    "actions": [
+      7,
+      14,
+      44,
+      7,
+      10,
+      57,
+      16,
+      9,
+      46,
+      2,
+      28,
+      8,
+      43,
+      0,
+      0
+    ],
+    "encoding": "cell 0..41, add 42 for pulse",
+    "note": "verified witness, not claimed optimal"
+  }
+]
